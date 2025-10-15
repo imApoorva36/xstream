@@ -126,11 +126,11 @@ Visit `http://localhost:3000` to explore xStream!
 
 **xStream** is built by a powerhouse team of Web3 innovators with expertise across blockchain, payments, and creator economy:
 
-- **Apoorva Agrawal** - Co-Founder & CEO
-- **Abhishek Satpathy** - Co-Founder & CTO
-- **Fahim Ahmed** - Co-Founder & Head of Product
-- **Chinmaya Sahu** - Co-Founder & Head of Engineering
-- **Vedant Tarale** - Co-Founder & Head of Growth
+- **Apoorva Agrawal** - Co-Founder
+- **Abhishek Satpathy** - Co-Founder
+- **Fahim Ahmed** - Co-Founder
+- **Chinmaya Sahu** - Co-Founder
+- **Vedant Tarale** - Co-Founder
 
 ## 💎 Why Now?
 
