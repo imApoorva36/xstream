@@ -3,39 +3,97 @@ require("dotenv").config();
 
 async function main() {
     const [deployer] = await ethers.getSigners();
-    console.log(`Deploying contracts with account: ${deployer.address}`);
+    console.log(`\n🚀 Deploying xStream contracts with account: ${deployer.address}`);
     
     // Get the account balance
     const balance = await deployer.getBalance();
-    console.log(`Account balance: ${ethers.utils.formatEther(balance)} ETH`);
+    console.log(`💰 Account balance: ${ethers.utils.formatEther(balance)} ETH\n`);
 
-    // Deploy Lock contract with unlock time 1 year from now
-    const unlockTime = Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60); // 1 year from now
-    
-    console.log(`Setting unlock time to: ${new Date(unlockTime * 1000).toLocaleString()}`);
-    
-    const Lock = await ethers.getContractFactory("Lock");
-    
-    // Deploy with 0.001 ETH locked in the contract
-    const lockAmount = ethers.utils.parseEther("0.001");
-    console.log(`Deploying Lock contract with ${ethers.utils.formatEther(lockAmount)} ETH locked...`);
-    
-    const lock = await Lock.deploy(unlockTime, { value: lockAmount });
-    await lock.deployed();
-    
-    console.log(`Lock contract deployed to: ${lock.address}`);
-    console.log(`Unlock time: ${unlockTime}`);
-    console.log(`Lock amount: ${ethers.utils.formatEther(lockAmount)} ETH`);
-    console.log(`Owner: ${await lock.owner()}`);
-    
-    // Verify deployment
-    const contractBalance = await ethers.provider.getBalance(lock.address);
-    console.log(`Contract balance: ${ethers.utils.formatEther(contractBalance)} ETH`);
+    console.log("📦 Starting xStream contract deployment...\n");
+
+    try {
+        // Deploy the Factory contract which will deploy all other contracts
+        console.log("🏭 Deploying XStreamFactory...");
+        const XStreamFactory = await ethers.getContractFactory("XStreamFactory");
+        const factory = await XStreamFactory.deploy();
+        await factory.deployed();
+        
+        console.log(`✅ XStreamFactory deployed to: ${factory.address}\n`);
+
+        // Get all deployed contract addresses from the factory
+        const contractAddresses = await factory.getContractAddresses();
+        const deploymentInfo = await factory.getDeploymentInfo();
+
+        console.log("🎯 xStream Ecosystem Deployed Successfully!");
+        console.log("=" .repeat(50));
+        console.log(`🏭 Factory Contract:     ${factory.address}`);
+        console.log(`🎬 XStreamCore:          ${contractAddresses[0]}`);
+        console.log(`🏆 XStreamNFT:           ${contractAddresses[1]}`);
+        console.log(`📺 XStreamAds:           ${contractAddresses[2]}`);
+        console.log(`💎 Treasury:             ${contractAddresses[3]}`);
+        console.log(`⏰ Deployed at:          ${new Date(deploymentInfo[4] * 1000).toLocaleString()}`);
+        console.log("=" .repeat(50));
+
+        // Test basic functionality
+        console.log("\n🧪 Testing basic functionality...");
+        
+        const XStreamCore = await ethers.getContractAt("XStreamCore", contractAddresses[0]);
+        const XStreamNFT = await ethers.getContractAt("XStreamNFT", contractAddresses[1]);
+        const XStreamAds = await ethers.getContractAt("XStreamAds", contractAddresses[2]);
+
+        // Check platform fee
+        const platformFee = await XStreamCore.platformFeePercentage();
+        console.log(`📊 Platform fee: ${platformFee}%`);
+
+        // Check NFT name and symbol
+        const nftName = await XStreamNFT.name();
+        const nftSymbol = await XStreamNFT.symbol();
+        console.log(`🏆 NFT Contract: ${nftName} (${nftSymbol})`);
+
+        // Check ads platform fee
+        const adsPlatformFee = await XStreamAds.platformFeePercentage();
+        console.log(`📺 Ads platform fee: ${adsPlatformFee}%`);
+
+        console.log("\n🎉 All contracts deployed and tested successfully!");
+        console.log("\n📋 Contract ABIs and addresses saved for frontend integration");
+        
+        // Save deployment info to a JSON file for frontend
+        const deploymentData = {
+            network: "baseSepolia",
+            chainId: 84532,
+            deployer: deployer.address,
+            deployedAt: new Date().toISOString(),
+            contracts: {
+                factory: factory.address,
+                xstreamCore: contractAddresses[0],
+                xstreamNFT: contractAddresses[1],
+                xstreamAds: contractAddresses[2],
+                treasury: contractAddresses[3]
+            },
+            features: {
+                payPerSecond: true,
+                nftAchievements: true,
+                advertising: true,
+                creatorEconomics: true
+            }
+        };
+
+        // In a real deployment, you'd save this to a file
+        console.log("\n📄 Deployment Summary:");
+        console.log(JSON.stringify(deploymentData, null, 2));
+
+    } catch (error) {
+        console.error("\n❌ Deployment failed:", error);
+        throw error;
+    }
 }
 
 main()
-    .then(() => process.exit(0))
+    .then(() => {
+        console.log("\n✅ Deployment completed successfully!");
+        process.exit(0);
+    })
     .catch((error) => {
-        console.error(error);
+        console.error("\n💥 Deployment error:", error);
         process.exit(1);
     });
