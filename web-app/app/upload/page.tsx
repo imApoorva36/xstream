@@ -1,0 +1,419 @@
+"use client";
+
+import { useState } from "react";
+import Header from "../components/Header";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Upload as UploadIcon, 
+  Video, 
+  DollarSign, 
+  Settings, 
+  Eye, 
+  Clock,
+  Zap,
+  AlertCircle,
+  CheckCircle
+} from "lucide-react";
+
+export default function UploadPage() {
+  const [uploadStep, setUploadStep] = useState(1);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [tags, setTags] = useState("");
+  const [pricePerSecond, setPricePerSecond] = useState("0.01");
+  const [maxQuality, setMaxQuality] = useState("1080p");
+  const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setVideoFile(file);
+      setUploadStep(2);
+    }
+  };
+
+  const handleSubmit = async () => {
+    setIsUploading(true);
+    // Here you would integrate with your upload API and x402 for the upload fee
+    setTimeout(() => {
+      setIsUploading(false);
+      setUploadStep(4);
+    }, 3000);
+  };
+
+  const calculateVideoCost = () => {
+    if (!videoFile) return "0.00";
+    // Mock calculation - in real app, you'd determine duration from video file
+    const estimatedDuration = 300; // 5 minutes
+    return (parseFloat(pricePerSecond) * estimatedDuration).toFixed(2);
+  };
+
+  const getQualityOptions = () => {
+    return [
+      { value: "4K", label: "4K (2160p)", multiplier: 1.0 },
+      { value: "1080p", label: "Full HD (1080p)", multiplier: 0.75 },
+      { value: "720p", label: "HD (720p)", multiplier: 0.5 },
+      { value: "480p", label: "SD (480p)", multiplier: 0.35 },
+      { value: "240p", label: "Low (240p)", multiplier: 0.2 }
+    ];
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Header />
+      
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Upload Video
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Share your content and earn with x402 micropayments
+          </p>
+        </div>
+
+        {/* Upload Steps */}
+        <div className="mb-8">
+          <div className="flex items-center justify-center space-x-4">
+            {[1, 2, 3, 4].map((step) => (
+              <div key={step} className="flex items-center">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                    step <= uploadStep
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+                  }`}
+                >
+                  {step < uploadStep ? <CheckCircle className="h-5 w-5" /> : step}
+                </div>
+                {step < 4 && (
+                  <div
+                    className={`w-16 h-0.5 ${
+                      step < uploadStep ? "bg-blue-600" : "bg-gray-200 dark:bg-gray-700"
+                    }`}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-center mt-2">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              {uploadStep === 1 && "Upload Video"}
+              {uploadStep === 2 && "Video Details"}
+              {uploadStep === 3 && "Pricing & Settings"}
+              {uploadStep === 4 && "Publishing"}
+            </div>
+          </div>
+        </div>
+
+        {/* Step 1: Upload Video */}
+        {uploadStep === 1 && (
+          <Card>
+            <CardContent className="p-8">
+              <div className="text-center">
+                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-12">
+                  <Video className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                    Upload your video
+                  </h3>
+                  <p className="text-gray-500 dark:text-gray-400 mb-6">
+                    Choose a video file to get started
+                  </p>
+                  
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleVideoUpload}
+                    className="hidden"
+                    id="video-upload"
+                  />
+                  <label htmlFor="video-upload">
+                    <Button className="cursor-pointer">
+                      <UploadIcon className="h-4 w-4 mr-2" />
+                      Select Video File
+                    </Button>
+                  </label>
+                  
+                  <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                    <p>Supported formats: MP4, MOV, AVI, WMV</p>
+                    <p>Maximum file size: 2GB</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Step 2: Video Details */}
+        {uploadStep === 2 && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Video Details</CardTitle>
+                <CardDescription>
+                  Add information about your video
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Title</label>
+                  <Input
+                    placeholder="Enter video title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Description</label>
+                  <Textarea
+                    placeholder="Describe your video content"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Tags</label>
+                  <Input
+                    placeholder="Enter tags separated by commas"
+                    value={tags}
+                    onChange={(e) => setTags(e.target.value)}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Example: blockchain, tutorial, crypto, x402
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Thumbnail</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setThumbnail(e.target.files?.[0] || null)}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={() => setUploadStep(1)}>
+                Back
+              </Button>
+              <Button onClick={() => setUploadStep(3)} disabled={!title.trim()}>
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Pricing & Settings */}
+        {uploadStep === 3 && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <DollarSign className="h-5 w-5 mr-2" />
+                  Pricing Settings
+                </CardTitle>
+                <CardDescription>
+                  Set your video pricing and quality options
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Price per Second (USD)
+                    </label>
+                    <Input
+                      type="number"
+                      step="0.001"
+                      min="0.001"
+                      placeholder="0.010"
+                      value={pricePerSecond}
+                      onChange={(e) => setPricePerSecond(e.target.value)}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Recommended: $0.005 - $0.020 per second
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Maximum Quality
+                    </label>
+                    <Select value={maxQuality} onValueChange={setMaxQuality}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getQualityOptions().map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Pricing Preview */}
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                  <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-3">
+                    Pricing Preview (5 min video example)
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    {getQualityOptions()
+                      .filter(q => q.multiplier <= getQualityOptions().find(opt => opt.value === maxQuality)?.multiplier!)
+                      .map((option) => (
+                        <div key={option.value} className="text-center">
+                          <Badge variant="outline" className="mb-1">
+                            {option.value}
+                          </Badge>
+                          <p className="font-medium">
+                            ${(parseFloat(pricePerSecond) * option.multiplier * 300).toFixed(2)}
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Upload Fee Info */}
+                <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg">
+                  <div className="flex items-start space-x-2">
+                    <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+                    <div>
+                      <h4 className="font-medium text-amber-700 dark:text-amber-300">
+                        Upload Fee
+                      </h4>
+                      <p className="text-sm text-amber-600 dark:text-amber-400">
+                        A one-time fee of $0.50 (paid via x402) is required to upload to xStream. 
+                        This helps maintain platform quality and covers storage costs.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="flex justify-between">
+              <Button variant="outline" onClick={() => setUploadStep(2)}>
+                Back
+              </Button>
+              <Button onClick={() => setUploadStep(4)}>
+                Review & Publish
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Publishing */}
+        {uploadStep === 4 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <CheckCircle className="h-5 w-5 mr-2 text-green-600" />
+                Ready to Publish
+              </CardTitle>
+              <CardDescription>
+                Review your video details and publish to xStream
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Video Summary */}
+              <div className="border rounded-lg p-4">
+                <h4 className="font-medium mb-3">Video Summary</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-500">Title:</span>
+                    <p className="font-medium">{title || "Untitled Video"}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Max Quality:</span>
+                    <p className="font-medium">{maxQuality}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Price per Second:</span>
+                    <p className="font-medium">${pricePerSecond}</p>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Upload Fee:</span>
+                    <p className="font-medium">$0.50 (via x402)</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Terms */}
+              <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                <p>By publishing, you agree to:</p>
+                <ul className="list-disc list-inside space-y-1 ml-4">
+                  <li>xStream's Terms of Service and Creator Guidelines</li>
+                  <li>Instant settlement of viewer payments to your connected wallet</li>
+                  <li>Quality-based pricing as configured above</li>
+                  <li>Platform fee of 5% on all viewer payments</li>
+                </ul>
+              </div>
+
+              <div className="flex justify-between">
+                <Button variant="outline" onClick={() => setUploadStep(3)}>
+                  Back
+                </Button>
+                <Button 
+                  onClick={handleSubmit}
+                  disabled={isUploading}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {isUploading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Publishing...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="h-4 w-4 mr-2" />
+                      Publish Video
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Success Message */}
+        {uploadStep === 5 && (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-600" />
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                Video Published Successfully!
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Your video is now live on xStream and ready for viewers to watch and pay per second.
+              </p>
+              <div className="flex justify-center space-x-4">
+                <Button variant="outline">
+                  <Eye className="h-4 w-4 mr-2" />
+                  View Video
+                </Button>
+                <Button>
+                  Upload Another
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}
