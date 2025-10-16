@@ -184,4 +184,22 @@
   .border-xstream {
     border-color: #3b82f6;
   }
+
+  /* Hide OnchainKit notification overlay - all possible selectors */
+  [data-testid="ockToast"],
+  [class*="ock-toast"],
+  [class*="ockToast"],
+  [class*="ock_toast"],
+  [role="alert"][class*="ock"],
+  div[style*="position: fixed"][style*="z-index"] > div[style*="position: fixed"]:has(button),
+  div[class*="ock"][style*="position: fixed"],
+  div[class*="onchain"][style*="position: fixed"],
+  /* Target any fixed position element with high z-index that looks like a notification */
+  div[style*="position: fixed"][style*="z-index: 9"] button[aria-label],
+  div[style*="position: fixed"][style*="right: 0"][style*="top: 0"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
 }

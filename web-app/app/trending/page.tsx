@@ -1,312 +1,183 @@
 "use client";
 
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
-import VideoCard from "../components/VideoCard";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Flame, Zap, Clock } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import Link from "next/link";
+import Header from "../components/Header";
+import { TrendingUp, Eye, Flame, Clock, Star } from "lucide-react";
 
-// Mock trending data
-const trendingVideos = {
-  now: [
-    {
-      id: "t1",
-      title: "BREAKING: New x402 Features Released!",
-      creator: "TechNews",
-      thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=320&h=180&fit=crop&crop=center",
-      duration: "5:45",
-      views: 15420,
-      uploadDate: "2 hours ago",
-      pricePerSecond: 0.015,
-      maxQuality: "4K",
-      description: "Latest x402 updates that will change micropayments forever",
-      trending: true
-    },
-    {
-      id: "t2",
-      title: "Building Your First DApp on Base",
-      creator: "BaseDev",
-      thumbnail: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=320&h=180&fit=crop&crop=center",
-      duration: "18:30",
-      views: 8930,
-      uploadDate: "4 hours ago",
-      pricePerSecond: 0.012,
-      maxQuality: "1080p",
-      description: "Complete tutorial for Base blockchain development"
-    },
-    {
-      id: "t3",
-      title: "Why Pay-Per-Second Will Kill Subscriptions",
-      creator: "FutureStreaming",
-      thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=320&h=180&fit=crop&crop=center",
-      duration: "12:15",
-      views: 12350,
-      uploadDate: "6 hours ago",
-      pricePerSecond: 0.008,
-      maxQuality: "1080p",
-      description: "Analysis of the streaming industry's biggest disruption"
-    }
-  ],
-  week: [
-    {
-      id: "w1",
-      title: "Creator Earnings: $50K in First Month",
-      creator: "SuccessStory",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=320&h=180&fit=crop&crop=center",
-      duration: "14:20",
-      views: 45600,
-      uploadDate: "3 days ago",
-      pricePerSecond: 0.010,
-      maxQuality: "4K",
-      description: "How one creator earned $50,000 in their first month on xStream"
-    },
-    {
-      id: "w2",
-      title: "NFT Rewards System Deep Dive",
-      creator: "Web3Academy",
-      thumbnail: "https://images.unsplash.com/photo-1616077167555-51f6bc516dfa?w=320&h=180&fit=crop&crop=center",
-      duration: "22:10",
-      views: 38920,
-      uploadDate: "5 days ago",
-      pricePerSecond: 0.009,
-      maxQuality: "1080p",
-      description: "Understanding xStream's revolutionary NFT reward system"
-    }
-  ],
-  crypto: [
-    {
-      id: "c1",
-      title: "Smart Contracts for Content Creators",
-      creator: "CryptoEdu",
-      thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=320&h=180&fit=crop&crop=center",
-      duration: "16:45",
-      views: 22100,
-      uploadDate: "1 day ago",
-      pricePerSecond: 0.011,
-      maxQuality: "1080p",
-      description: "How smart contracts ensure fair creator compensation"
-    },
-    {
-      id: "c2",
-      title: "Base vs Other L2s: Complete Comparison",
-      creator: "BlockchainAnalyst",
-      thumbnail: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=320&h=180&fit=crop&crop=center",
-      duration: "25:30",
-      views: 31400,
-      uploadDate: "2 days ago",
-      pricePerSecond: 0.013,
-      maxQuality: "4K",
-      description: "Comprehensive analysis of Layer 2 blockchain solutions"
-    }
-  ]
-};
-
-const trendingStats = [
+const trendingVideos = [
   {
-    title: "Total Views Today",
-    value: "2.4M",
-    change: "+15.3%",
-    icon: TrendingUp,
-    color: "text-blue-600"
+    id: "2",
+    title: "Building on Base Developer Guide",
+    creator: "BaseBuilder",
+    thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=640&h=360&fit=crop",
+    duration: "15:45",
+    views: 23420,
+    uploadDate: "1 day ago",
+    pricePerSecond: 0.008,
+    trending: true,
+    trendScore: 95,
   },
   {
-    title: "Creator Earnings",
-    value: "$125K",
-    change: "+22.1%",
-    icon: Zap,
-    color: "text-green-600"
+    id: "6",
+    title: "Blockchain Explained Simply",
+    creator: "EduChain",
+    thumbnail: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=640&h=360&fit=crop",
+    duration: "9:30",
+    views: 31800,
+    uploadDate: "2 days ago",
+    pricePerSecond: 0.007,
+    trending: true,
+    trendScore: 92,
   },
   {
-    title: "Active Viewers",
-    value: "45.2K",
-    change: "+8.7%",
-    icon: Flame,
-    color: "text-red-600"
+    id: "4",
+    title: "Real-time Video Monetization",
+    creator: "StreamTech",
+    thumbnail: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=640&h=360&fit=crop",
+    duration: "12:15",
+    views: 19100,
+    uploadDate: "5 hours ago",
+    pricePerSecond: 0.012,
+    trending: true,
+    trendScore: 88,
   },
   {
-    title: "Avg Watch Time",
-    value: "8.4 min",
-    change: "+12.5%",
-    icon: Clock,
-    color: "text-purple-600"
-  }
+    id: "11",
+    title: "Crypto Trading Strategies",
+    creator: "TradeWizard",
+    thumbnail: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=640&h=360&fit=crop",
+    duration: "11:25",
+    views: 22140,
+    uploadDate: "3 days ago",
+    pricePerSecond: 0.011,
+    trending: true,
+    trendScore: 85,
+  },
+  {
+    id: "10",
+    title: "Web3 Gaming Revolution",
+    creator: "GameChain",
+    thumbnail: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=640&h=360&fit=crop",
+    duration: "16:40",
+    views: 18950,
+    uploadDate: "2 days ago",
+    pricePerSecond: 0.010,
+    trending: true,
+    trendScore: 82,
+  },
+  {
+    id: "8",
+    title: "Creating NFT Collection",
+    creator: "NFTMaster",
+    thumbnail: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=640&h=360&fit=crop",
+    duration: "11:45",
+    views: 16730,
+    uploadDate: "3 days ago",
+    pricePerSecond: 0.009,
+    trending: true,
+    trendScore: 79,
+  },
 ];
 
 export default function TrendingPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
       <Header />
-      
-      <div className="flex flex-1">
-        <Sidebar />
-        
-        <main className="flex-1 p-6">
-          <div className="mb-8">
-            <div className="flex items-center space-x-2 mb-2">
-              <TrendingUp className="h-8 w-8 text-red-500" />
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Trending on xStream
-              </h1>
-              <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                <Flame className="h-3 w-3 mr-1" />
-                Hot
-              </Badge>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-3 rounded-xl">
+              <TrendingUp className="w-8 h-8 text-white" />
             </div>
-            <p className="text-gray-600 dark:text-gray-400">
-              Discover the most popular content and rising creators
-            </p>
-          </div>
-
-          {/* Trending Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {trendingStats.map((stat, index) => (
-              <Card key={index}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        {stat.title}
-                      </p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {stat.value}
-                      </p>
-                      <p className={`text-sm ${stat.color} font-medium`}>
-                        {stat.change} from yesterday
-                      </p>
-                    </div>
-                    <stat.icon className={`h-8 w-8 ${stat.color}`} />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Trending Categories */}
-          <Tabs defaultValue="now" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
-              <TabsTrigger value="now" className="flex items-center space-x-2">
-                <Flame className="h-4 w-4" />
-                <span>Trending Now</span>
-              </TabsTrigger>
-              <TabsTrigger value="week" className="flex items-center space-x-2">
-                <TrendingUp className="h-4 w-4" />
-                <span>This Week</span>
-              </TabsTrigger>
-              <TabsTrigger value="crypto" className="flex items-center space-x-2">
-                <Zap className="h-4 w-4" />
-                <span>Crypto</span>
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="now" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Flame className="h-5 w-5 text-red-500" />
-                    <span>Trending Right Now</span>
-                  </CardTitle>
-                  <CardDescription>
-                    The hottest content gaining views this hour
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {trendingVideos.now.map((video) => (
-                  <VideoCard key={video.id} video={video} />
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="week" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <TrendingUp className="h-5 w-5 text-blue-500" />
-                    <span>Top This Week</span>
-                  </CardTitle>
-                  <CardDescription>
-                    Most popular videos from the past 7 days
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {trendingVideos.week.map((video) => (
-                  <VideoCard key={video.id} video={video} />
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="crypto" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Zap className="h-5 w-5 text-yellow-500" />
-                    <span>Crypto & Web3</span>
-                  </CardTitle>
-                  <CardDescription>
-                    Trending blockchain and cryptocurrency content
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {trendingVideos.crypto.map((video) => (
-                  <VideoCard key={video.id} video={video} />
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
-
-          {/* Platform Highlights */}
-          <div className="mt-12 space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              xStream Highlights
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-blue-100 dark:bg-blue-800 rounded-full">
-                      <Zap className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
-                        Pay Per Second
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Only pay for what you actually watch - no more subscription waste
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-green-100 dark:bg-green-800 rounded-full">
-                      <TrendingUp className="h-6 w-6 text-green-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
-                        Creator First
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        100% of payments go directly to creators - no middleman cuts
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            <div>
+              <h1 className="text-4xl font-bold text-white">Trending Now</h1>
+              <p className="text-gray-300">Most popular videos on xStream right now</p>
             </div>
           </div>
-        </main>
+        </div>
+
+        {/* Tabs */}
+        <Tabs defaultValue="hot" className="mb-8">
+          <TabsList className="bg-white/5 border border-white/10">
+            <TabsTrigger value="hot">
+              <Flame className="w-4 h-4 mr-2" />
+              Hot
+            </TabsTrigger>
+            <TabsTrigger value="new">
+              <Clock className="w-4 h-4 mr-2" />
+              New & Rising
+            </TabsTrigger>
+            <TabsTrigger value="top">
+              <Star className="w-4 h-4 mr-2" />
+              Top Rated
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="hot" className="mt-8">
+            <VideoGrid videos={trendingVideos} />
+          </TabsContent>
+          <TabsContent value="new" className="mt-8">
+            <VideoGrid videos={trendingVideos.filter((_, i) => i < 3)} />
+          </TabsContent>
+          <TabsContent value="top" className="mt-8">
+            <VideoGrid videos={trendingVideos.filter((v) => v.trendScore > 85)} />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
+  );
+}
+
+function VideoGrid({ videos }: { videos: typeof trendingVideos }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {videos.map((video) => (
+        <VideoCard key={video.id} video={video} />
+      ))}
+    </div>
+  );
+}
+
+function VideoCard({ video }: { video: typeof trendingVideos[0] }) {
+  return (
+    <Link href={`/watch/${video.id}`}>
+      <Card className="group bg-white/5 backdrop-blur border-white/10 hover:bg-white/10 hover:border-blue-500/50 transition-all overflow-hidden cursor-pointer">
+        <div className="relative aspect-video overflow-hidden">
+          <img 
+            src={video.thumbnail} 
+            alt={video.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+          <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs text-white">{video.duration}</div>
+          <Badge className="absolute top-2 left-2 bg-blue-500/90 flex items-center gap-1">
+            <Flame className="w-3 h-3" />
+            {video.trendScore}
+          </Badge>
+        </div>
+        <div className="p-4">
+          <h3 className="text-white font-semibold mb-2 line-clamp-2 group-hover:text-blue-400 transition">{video.title}</h3>
+          <p className="text-gray-400 text-sm mb-3">{video.creator}</p>
+          <div className="flex items-center justify-between text-xs text-gray-400">
+            <div className="flex items-center gap-1">
+              <Eye className="w-3 h-3" />
+              <span>{video.views.toLocaleString()} views</span>
+            </div>
+            <span>{video.uploadDate}</span>
+          </div>
+          <div className="mt-3 pt-3 border-t border-white/10">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-gray-400">Price per second</span>
+              <span className="text-blue-400 font-semibold">${video.pricePerSecond}</span>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </Link>
   );
 }

@@ -87,16 +87,36 @@ export default function AdvertisePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
       <Header />
+      
+      {/* Creator Tool Banner */}
+      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 border-b border-blue-500/50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-lg backdrop-blur">
+                <Target className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-white font-bold text-lg">Creator Studio - Advertising</h2>
+                <p className="text-blue-100 text-sm">Reach your audience with targeted ads</p>
+              </div>
+            </div>
+            <Badge className="bg-white/20 text-white border-white/30 hidden sm:flex">
+              Creator Tool
+            </Badge>
+          </div>
+        </div>
+      </div>
       
       <div className="container mx-auto px-4 py-6">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Advertise on xStream
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Reach your audience with targeted video advertising
+          <p className="text-gray-300">
+            Create campaigns, track performance, and grow your reach
           </p>
         </div>
 

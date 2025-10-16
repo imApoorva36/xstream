@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   ConnectWallet,
   Wallet,
@@ -17,63 +16,77 @@ import {
   Identity,
   EthBalance,
 } from "@coinbase/onchainkit/identity";
-import { Search, Upload, Bell, User, Menu } from "lucide-react";
+import { Search, Upload as UploadIcon, Play, TrendingUp, Home, LayoutDashboard, Wallet as WalletIcon, Target } from "lucide-react";
 import Link from "next/link";
 
 export default function Header() {
   return (
-    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-      <div className="flex items-center justify-between">
-        {/* Left side - Logo and Menu */}
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" className="md:hidden">
-            <Menu className="h-5 w-5" />
-          </Button>
-          
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="text-2xl font-bold text-blue-600">xStream</div>
-            <Badge variant="secondary" className="text-xs">BETA</Badge>
-          </Link>
-        </div>
+    <header className="sticky top-0 z-50 bg-black/20 backdrop-blur-lg border-b border-white/10">
+      <div className="px-6 py-4 flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2">
+          <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2 rounded-lg">
+            <Play className="w-6 h-6 text-white" fill="white" />
+          </div>
+          <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            xStream
+          </span>
+        </Link>
 
-        {/* Center - Search */}
-        <div className="hidden md:flex flex-1 max-w-2xl mx-4">
-          <div className="flex w-full">
-            <Input
-              type="text"
-              placeholder="Search videos, creators, or topics..."
-              className="rounded-r-none border-r-0"
-            />
-            <Button 
-              variant="outline" 
-              className="rounded-l-none border-l-0 px-6"
-            >
-              <Search className="h-4 w-4" />
+        {/* Navigation Links */}
+        <nav className="hidden md:flex items-center gap-4 ml-8">
+          <Link href="/browse">
+            <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-blue-400">
+              <Home className="w-4 h-4 mr-2" />
+              Browse
             </Button>
+          </Link>
+          <Link href="/trending">
+            <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-blue-400">
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Trending
+            </Button>
+          </Link>
+          <Link href="/dashboard">
+            <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-blue-400">
+              <LayoutDashboard className="w-4 h-4 mr-2" />
+              Dashboard
+            </Button>
+          </Link>
+          <div className="w-px h-6 bg-white/20 mx-2"></div>
+          <Link href="/advertise">
+            <Button variant="ghost" className="text-cyan-400 hover:bg-cyan-500/20 hover:text-cyan-300 border border-cyan-500/30">
+              <Target className="w-4 h-4 mr-2" />
+              Advertise
+            </Button>
+          </Link>
+        </nav>
+        
+        {/* Search Bar */}
+        <div className="flex-1 max-w-2xl mx-8 hidden lg:block">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Input 
+              placeholder="Search videos, creators, topics..." 
+              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-400 focus:border-blue-500"
+            />
           </div>
         </div>
 
-        {/* Right side - Actions and Wallet */}
-        <div className="flex items-center space-x-3">
-          {/* Upload Button */}
+        {/* Right side actions */}
+        <div className="flex items-center gap-4">
           <Link href="/upload">
-            <Button variant="outline" size="sm" className="hidden sm:flex">
-              <Upload className="h-4 w-4 mr-2" />
-              Upload
+            <Button variant="ghost" className="text-white hover:bg-white/10">
+              <UploadIcon className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">Upload</span>
             </Button>
           </Link>
-
-          {/* Notifications */}
-          <Button variant="ghost" size="sm">
-            <Bell className="h-5 w-5" />
-          </Button>
-
-          {/* Wallet Connection */}
+          
           <div className="wallet-container">
             <Wallet>
-              <ConnectWallet>
-                <Avatar className="h-8 w-8" />
-                <Name className="hidden sm:block ml-2" />
+              <ConnectWallet className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
+                <WalletIcon className="w-4 h-4 mr-2" />
+                <span>Connect</span>
               </ConnectWallet>
               <WalletDropdown>
                 <Identity className="px-4 pt-3 pb-2" hasCopyAddressOnClick>
@@ -84,37 +97,20 @@ export default function Header() {
                 </Identity>
                 <WalletDropdownLink
                   icon="wallet"
+                  href="https://keys.coinbase.com"
+                >
+                  Wallet
+                </WalletDropdownLink>
+                <WalletDropdownLink
+                  icon="wallet"
                   href="/dashboard"
                 >
                   Dashboard
-                </WalletDropdownLink>
-                <WalletDropdownLink
-                  icon="user"
-                  href="/profile"
-                >
-                  Profile
                 </WalletDropdownLink>
                 <WalletDropdownDisconnect />
               </WalletDropdown>
             </Wallet>
           </div>
-        </div>
-      </div>
-
-      {/* Mobile Search */}
-      <div className="md:hidden mt-3">
-        <div className="flex w-full">
-          <Input
-            type="text"
-            placeholder="Search videos..."
-            className="rounded-r-none border-r-0"
-          />
-          <Button 
-            variant="outline" 
-            className="rounded-l-none border-l-0 px-6"
-          >
-            <Search className="h-4 w-4" />
-          </Button>
         </div>
       </div>
     </header>

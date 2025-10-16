@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Header from "../components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,8 @@ import {
   Clock,
   Zap,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  Target
 } from "lucide-react";
 
 export default function UploadPage() {
@@ -44,7 +46,7 @@ export default function UploadPage() {
     // Here you would integrate with your upload API and x402 for the upload fee
     setTimeout(() => {
       setIsUploading(false);
-      setUploadStep(4);
+      setUploadStep(5);
     }, 3000);
   };
 
@@ -66,15 +68,43 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
       <Header />
+      
+      {/* Creator Tool Banner */}
+      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 border-b border-blue-500/50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-lg backdrop-blur">
+                <UploadIcon className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-white font-bold text-lg">Creator Studio - Upload</h2>
+                <p className="text-blue-100 text-sm">Share your content and start earning</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link href="/advertise" className="hidden md:block">
+                <Button variant="ghost" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
+                  <Target className="h-4 w-4 mr-2" />
+                  Advertise
+                </Button>
+              </Link>
+              <Badge className="bg-white/20 text-white border-white/30 hidden sm:flex">
+                Creator Tool
+              </Badge>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Upload Video
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-300">
             Share your content and earn with x402 micropayments
           </p>
         </div>
@@ -392,26 +422,67 @@ export default function UploadPage() {
 
         {/* Success Message */}
         {uploadStep === 5 && (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-600" />
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Video Published Successfully!
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Your video is now live on xStream and ready for viewers to watch and pay per second.
-              </p>
-              <div className="flex justify-center space-x-4">
-                <Button variant="outline">
-                  <Eye className="h-4 w-4 mr-2" />
-                  View Video
-                </Button>
-                <Button>
-                  Upload Another
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="space-y-6">
+            <Card>
+              <CardContent className="p-8 text-center">
+                <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-600" />
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  Video Published Successfully!
+                </h3>
+                <p className="text-gray-300 mb-6">
+                  Your video is now live on xStream and ready for viewers to watch and pay per second.
+                </p>
+                <div className="flex justify-center space-x-4">
+                  <Button variant="outline" className="text-white border-white/20 hover:bg-white/10">
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Video
+                  </Button>
+                  <Button onClick={() => { setUploadStep(1); setVideoFile(null); setTitle(""); }} className="bg-blue-600 hover:bg-blue-700">
+                    Upload Another
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Promote Video with Ads CTA */}
+            <Card className="border-2 border-blue-500/50 bg-gradient-to-br from-blue-500/10 to-cyan-500/10">
+              <CardContent className="p-8">
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                  <div className="bg-gradient-to-br from-blue-500 to-cyan-500 p-4 rounded-xl">
+                    <Target className="h-12 w-12 text-white" />
+                  </div>
+                  <div className="flex-1 text-center md:text-left">
+                    <h3 className="text-2xl font-bold text-white mb-2">
+                      Want More Views? Try Advertising! 🚀
+                    </h3>
+                    <p className="text-gray-300 mb-4">
+                      Promote your video to the right audience with xStream's targeted advertising. 
+                      Pay only for actual views, and earn even when viewers skip!
+                    </p>
+                    <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                      <Badge className="bg-green-500/20 text-green-400 border-green-500/50">
+                        Pay-Per-View
+                      </Badge>
+                      <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/50">
+                        Skip Revenue Share
+                      </Badge>
+                      <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/50">
+                        Precision Targeting
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <Link href="/advertise">
+                      <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/50">
+                        <Target className="h-5 w-5 mr-2" />
+                        Create Ad Campaign
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         )}
       </div>
     </div>

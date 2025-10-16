@@ -85,21 +85,21 @@ export default function DashboardPage() {
   const nftMilestones = [
     { name: "First Video", description: "Watched your first video", earned: true, icon: "🎬" },
     { name: "10 Minutes", description: "Watched 10 minutes of content", earned: true, icon: "⏰" },
-    { name: "Early Adopter", description: "Joined during beta", earned: true, icon: "🚀" },
+    { name: "Early Adopter", description: "Joined the platform early", earned: true, icon: "🚀" },
     { name: "Supporter", description: "Spent $10 on content", earned: false, icon: "💝" },
     { name: "Binge Watcher", description: "Watch 100 minutes", earned: false, icon: "📺" },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
       <Header />
       
       <div className="container mx-auto px-4 py-6">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Dashboard
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-300">
             Track your xStream activity and earnings
           </p>
         </div>
@@ -173,11 +173,11 @@ export default function DashboardPage() {
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                         Watch Time
                       </p>
-                      <p className="text-2xl font-bold text-purple-600">
+                      <p className="text-2xl font-bold text-blue-600">
                         {Math.floor(userStats.totalWatchTime / 60)}h {userStats.totalWatchTime % 60}m
                       </p>
                     </div>
-                    <Clock className="h-8 w-8 text-purple-600" />
+                    <Clock className="h-8 w-8 text-blue-600" />
                   </div>
                 </CardContent>
               </Card>
@@ -262,11 +262,11 @@ export default function DashboardPage() {
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                         Subscribers
                       </p>
-                      <p className="text-2xl font-bold text-purple-600">
+                      <p className="text-2xl font-bold text-blue-600">
                         {creatorStats.subscribers}
                       </p>
                     </div>
-                    <Users className="h-8 w-8 text-purple-600" />
+                    <Users className="h-8 w-8 text-blue-600" />
                   </div>
                 </CardContent>
               </Card>
@@ -378,11 +378,11 @@ export default function DashboardPage() {
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                         Favorite Creators
                       </p>
-                      <p className="text-2xl font-bold text-purple-600">
+                      <p className="text-2xl font-bold text-blue-600">
                         {userStats.favoriteCreators}
                       </p>
                     </div>
-                    <Star className="h-8 w-8 text-purple-600" />
+                    <Star className="h-8 w-8 text-blue-600" />
                   </div>
                 </CardContent>
               </Card>
@@ -430,11 +430,11 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   
-                  <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                    <h4 className="font-medium text-purple-700 dark:text-purple-300 mb-2">
+                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-2">
                       Peak Watching Time
                     </h4>
-                    <p className="text-sm text-purple-600 dark:text-purple-400">
+                    <p className="text-sm text-blue-600 dark:text-blue-400">
                       7-9 PM weekdays - Perfect for evening learning sessions
                     </p>
                   </div>
