@@ -5,6 +5,7 @@ import { OnchainKitProvider } from '@coinbase/onchainkit';
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { coinbaseWallet, metaMask, walletConnect } from 'wagmi/connectors';
+import { useAutoCreateUser } from './hooks/useAutoCreateUser';
 import type { ReactNode } from 'react';
 
 // Wagmi config with OnchainKit
@@ -34,6 +35,11 @@ const config = createConfig({
 
 const queryClient = new QueryClient();
 
+function AutoCreateUserWrapper({ children }: { children: ReactNode }) {
+  useAutoCreateUser();
+  return <>{children}</>;
+}
+
 export function Providers(props: { children: ReactNode }) {
   return (
     <WagmiProvider config={config}>
@@ -48,7 +54,9 @@ export function Providers(props: { children: ReactNode }) {
             },
           }}
         >
-          {props.children}
+          <AutoCreateUserWrapper>
+            {props.children}
+          </AutoCreateUserWrapper>
         </OnchainKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

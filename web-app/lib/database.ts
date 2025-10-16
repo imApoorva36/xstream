@@ -1,90 +1,77 @@
-// Database utility functions for xStream platform
+// Database utility functions for xStream platform - Simplified MVP
 
 import { prisma } from './prisma'
-import type { User, Video, ViewSession, Achievement } from '@prisma/client'
 
 // User Operations
 export const userService = {
-  // Create user with Web3 wallet or email
-  async createUser(data: {
-    email?: string
+  // Create or get user by wallet address
+  async upsertUser(walletAddress: string, data?: {
     username?: string
     displayName?: string
-    walletAddress?: string
-    ensName?: string
+    profileImage?: string
   }) {
-    return await prisma.user.create({
-      data
+    return await prisma.user.upsert({
+      where: { walletAddress: walletAddress.toLowerCase() },
+      create: {
+        walletAddress: walletAddress.toLowerCase(),
+        ...data
+      },
+      update: data || {}
     })
   },
 
-  // Find user by wallet or email
-  async findUser(identifier: string) {
-    return await prisma.user.findFirst({
-      where: {
-        OR: [
-          { email: identifier },
-          { walletAddress: identifier.toLowerCase() },
-          { username: identifier }
-        ]
-      }
-    })
-  },
-
-  // Update user profile
-  async updateProfile(userId: string, data: Partial<User>) {
-    return await prisma.user.update({
-      where: { id: userId },
-      data
+  // Find user by wallet
+  async findByWallet(walletAddress: string) {
+    return await prisma.user.findUnique({
+      where: { walletAddress: walletAddress.toLowerCase() }
     })
   },
 
   // Get user with stats
-  async getUserWithStats(userId: string) {
+  async getUserWithStats(walletAddress: string) {
     const user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { walletAddress: walletAddress.toLowerCase() },
       include: {
         videos: {
-          where: { status: 'PUBLISHED' },
           select: {
             id: true,
             title: true,
             totalViews: true,
             totalEarnings: true,
-            createdAt: true
+            totalWatchTime: true,
+            publishedAt: true
           }
         },
-        stakes: {
-          where: { status: 'ACTIVE' },
-          select: { amount: true }
-        },
-        achievements: {
-          where: { isEarned: true },
-          include: { achievement: true }
+        viewSessions: {
+          select: {
+            watchedSeconds: true,
+            amountCharged: true
+          }
         },
         earnings: {
           where: { status: 'PAID' },
-          select: { amount: true, source: true, createdAt: true }
+          select: { amount: true, paidAt: true }
         }
       }
     })
 
     if (!user) return null
 
-    // Calculate derived stats
-    const totalStaked = user.stakes.reduce((sum, stake) => sum + Number(stake.amount), 0)
-    const totalEarned = user.earnings.reduce((sum, earning) => sum + Number(earning.amount), 0)
+    // Calculate stats
+    const totalEarned = user.earnings.reduce((sum: number, e: any) => sum + Number(e.amount), 0)
     const totalVideos = user.videos.length
-    const totalViews = user.videos.reduce((sum, video) => sum + video.totalViews, 0)
+    const totalViews = user.videos.reduce((sum: number, v: any) => sum + v.totalViews, 0)
+    const totalWatchTime = user.viewSessions.reduce((sum: number, s: any) => sum + s.watchedSeconds, 0)
+    const totalSpent = user.viewSessions.reduce((sum: number, s: any) => sum + Number(s.amountCharged), 0)
 
     return {
       ...user,
       stats: {
-        totalStaked,
         totalEarned,
         totalVideos,
         totalViews,
-        achievementsEarned: user.achievements.length
+        totalWatchTime,
+        totalSpent
       }
     }
   }
@@ -112,26 +99,8 @@ export const videoService = {
     })
   },
 
-  // Get video with creator info
-  async getVideoWithCreator(videoId: string) {
-    return await prisma.video.findUnique({
-      where: { id: videoId },
-      include: {
-        creator: {
-          select: {
-            id: true,
-            username: true,
-            displayName: true,
-            profileImage: true
-          }
-        },
-        qualities: true
-      }
-    })
-  },
-
-  // Get videos with pagination and filters
-  async getVideos(options: {
+  // Get videos with filters
+  async getVideos(params?: {
     page?: number
     limit?: number
     category?: string
@@ -139,34 +108,32 @@ export const videoService = {
     search?: string
     sortBy?: 'recent' | 'popular' | 'earnings'
   }) {
-    const { page = 1, limit = 20, category, tags, search, sortBy = 'recent' } = options
+    const page = params?.page || 1
+    const limit = params?.limit || 20
     const skip = (page - 1) * limit
 
-    const where: any = {
-      status: 'PUBLISHED',
-      isActive: true
+    const where: any = {}
+    
+    if (params?.category) {
+      where.category = params.category
     }
-
-    if (category) where.category = category
-    if (tags?.length) where.tags = { hasSome: tags }
-    if (search) {
+    
+    if (params?.tags && params.tags.length > 0) {
+      where.tags = {
+        hasSome: params.tags
+      }
+    }
+    
+    if (params?.search) {
       where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } }
+        { title: { contains: params.search, mode: 'insensitive' } },
+        { description: { contains: params.search, mode: 'insensitive' } }
       ]
     }
 
-    const orderBy: any = {}
-    switch (sortBy) {
-      case 'popular':
-        orderBy.totalViews = 'desc'
-        break
-      case 'earnings':
-        orderBy.totalEarnings = 'desc'
-        break
-      default:
-        orderBy.publishedAt = 'desc'
-    }
+    let orderBy: any = { publishedAt: 'desc' }
+    if (params?.sortBy === 'popular') orderBy = { totalViews: 'desc' }
+    if (params?.sortBy === 'earnings') orderBy = { totalEarnings: 'desc' }
 
     const [videos, total] = await Promise.all([
       prisma.video.findMany({
@@ -178,6 +145,7 @@ export const videoService = {
           creator: {
             select: {
               id: true,
+              walletAddress: true,
               username: true,
               displayName: true,
               profileImage: true
@@ -194,25 +162,41 @@ export const videoService = {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
+        totalPages: Math.ceil(total / limit)
       }
     }
   },
 
-  // Update video analytics
-  async updateVideoStats(videoId: string, stats: {
-    viewsIncrement?: number
-    watchTimeIncrement?: number
-    earningsIncrement?: number
+  // Get video by ID
+  async getVideoById(id: string) {
+    return await prisma.video.findUnique({
+      where: { id },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            walletAddress: true,
+            username: true,
+            displayName: true,
+            profileImage: true
+          }
+        }
+      }
+    })
+  },
+
+  // Update video stats
+  async updateStats(id: string, data: {
+    totalViews?: number
+    totalWatchTime?: number
+    totalEarnings?: number
   }) {
-    const { viewsIncrement = 0, watchTimeIncrement = 0, earningsIncrement = 0 } = stats
-    
     return await prisma.video.update({
-      where: { id: videoId },
+      where: { id },
       data: {
-        totalViews: { increment: viewsIncrement },
-        totalWatchTime: { increment: watchTimeIncrement },
-        totalEarnings: { increment: earningsIncrement }
+        totalViews: data.totalViews !== undefined ? { increment: 1 } : undefined,
+        totalWatchTime: data.totalWatchTime !== undefined ? { increment: data.totalWatchTime } : undefined,
+        totalEarnings: data.totalEarnings !== undefined ? { increment: data.totalEarnings } : undefined
       }
     })
   }
@@ -220,326 +204,119 @@ export const videoService = {
 
 // View Session Operations
 export const sessionService = {
-  // Create new viewing session
+  // Create new session
   async createSession(data: {
     sessionToken: string
     viewerId: string
     videoId: string
-    stakedAmount: number
-    qualityWatched: string
-    deviceType?: string
-    browserInfo?: string
-    ipAddress?: string
   }) {
     return await prisma.viewSession.create({
-      data: {
-        ...data,
-        stakedAmount: data.stakedAmount.toString()
-      }
+      data
     })
   },
 
-  // Update session progress
-  async updateSession(sessionToken: string, data: {
-    watchedSeconds?: number
-    amountCharged?: number
-    status?: 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'EXPIRED'
-    endTime?: Date
-  }) {
-    const updateData: any = { ...data }
-    if (data.amountCharged !== undefined) {
-      updateData.amountCharged = data.amountCharged.toString()
-    }
-
-    return await prisma.viewSession.update({
-      where: { sessionToken },
-      data: updateData
-    })
-  },
-
-  // Get active session
-  async getActiveSession(sessionToken: string) {
+  // Get session
+  async getSession(sessionToken: string) {
     return await prisma.viewSession.findUnique({
       where: { sessionToken },
       include: {
-        video: {
-          select: {
-            id: true,
-            title: true,
-            pricePerSecond: true,
-            duration: true
-          }
-        },
-        viewer: {
-          select: {
-            id: true,
-            username: true,
-            walletAddress: true
-          }
-        }
+        video: true,
+        viewer: true
       }
     })
   },
 
-  // Get user's session history
-  async getUserSessions(userId: string, page = 1, limit = 10) {
+  // Update session (watched time, charged amount)
+  async updateSession(sessionToken: string, data: {
+    watchedSeconds?: number
+    amountCharged?: number
+    status?: string
+    endTime?: Date
+  }) {
+    return await prisma.viewSession.update({
+      where: { sessionToken },
+      data: {
+        watchedSeconds: data.watchedSeconds,
+        amountCharged: data.amountCharged?.toString(),
+        status: data.status,
+        endTime: data.endTime
+      }
+    })
+  },
+
+  // Complete session
+  async completeSession(sessionToken: string) {
+    return await prisma.viewSession.update({
+      where: { sessionToken },
+      data: {
+        status: 'COMPLETED',
+        endTime: new Date()
+      }
+    })
+  }
+}
+
+// Creator Earnings Operations
+export const earningService = {
+  // Create earning record
+  async createEarning(data: {
+    amount: number
+    creatorId: string
+    videoId?: string
+    sessionId?: string
+    txHash?: string
+  }) {
+    return await prisma.creatorEarning.create({
+      data: {
+        ...data,
+        amount: data.amount.toString()
+      }
+    })
+  },
+
+  // Get creator earnings
+  async getCreatorEarnings(creatorId: string, params?: {
+    status?: string
+    page?: number
+    limit?: number
+  }) {
+    const page = params?.page || 1
+    const limit = params?.limit || 20
     const skip = (page - 1) * limit
 
-    const [sessions, total] = await Promise.all([
-      prisma.viewSession.findMany({
-        where: { viewerId: userId },
-        orderBy: { startTime: 'desc' },
+    const where: any = { creatorId }
+    if (params?.status) where.status = params.status
+
+    const [earnings, total] = await Promise.all([
+      prisma.creatorEarning.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
         skip,
-        take: limit,
-        include: {
-          video: {
-            select: {
-              id: true,
-              title: true,
-              thumbnailUrl: true,
-              duration: true
-            }
-          }
-        }
+        take: limit
       }),
-      prisma.viewSession.count({ where: { viewerId: userId } })
+      prisma.creatorEarning.count({ where })
     ])
 
     return {
-      sessions,
+      earnings,
       pagination: {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
+        totalPages: Math.ceil(total / limit)
       }
     }
-  }
-}
-
-// Achievement Operations
-export const achievementService = {
-  // Get all achievements with user progress
-  async getAchievementsForUser(userId: string) {
-    const achievements = await prisma.achievement.findMany({
-      where: { isActive: true },
-      include: {
-        userAchievements: {
-          where: { userId },
-          select: {
-            currentValue: true,
-            isEarned: true,
-            earnedAt: true,
-            tokenId: true
-          }
-        }
-      }
-    })
-
-    return achievements.map(achievement => ({
-      ...achievement,
-      userProgress: achievement.userAchievements[0] || {
-        currentValue: 0,
-        isEarned: false,
-        earnedAt: null,
-        tokenId: null
-      }
-    }))
   },
 
-  // Update achievement progress
-  async updateAchievementProgress(userId: string, achievementId: string, newValue: number) {
-    const achievement = await prisma.achievement.findUnique({
-      where: { id: achievementId }
-    })
-
-    if (!achievement) throw new Error('Achievement not found')
-
-    const isEarned = newValue >= achievement.threshold
-
-    return await prisma.userAchievement.upsert({
-      where: {
-        userId_achievementId: {
-          userId,
-          achievementId
-        }
-      },
-      update: {
-        currentValue: newValue,
-        isEarned,
-        earnedAt: isEarned ? new Date() : undefined
-      },
-      create: {
-        userId,
-        achievementId,
-        currentValue: newValue,
-        isEarned,
-        earnedAt: isEarned ? new Date() : undefined
+  // Mark earning as paid
+  async markAsPaid(id: string, txHash: string) {
+    return await prisma.creatorEarning.update({
+      where: { id },
+      data: {
+        status: 'PAID',
+        txHash,
+        paidAt: new Date()
       }
-    })
-  },
-
-  // Check and update watch time achievements
-  async checkWatchTimeAchievements(userId: string) {
-    // Get user's total watch time
-    const totalWatchTime = await prisma.viewSession.aggregate({
-      where: {
-        viewerId: userId,
-        status: 'COMPLETED'
-      },
-      _sum: {
-        watchedSeconds: true
-      }
-    })
-
-    const watchedSeconds = totalWatchTime._sum.watchedSeconds || 0
-
-    // Get watch time achievements
-    const watchTimeAchievements = await prisma.achievement.findMany({
-      where: {
-        category: 'WATCH_TIME',
-        isActive: true
-      }
-    })
-
-    // Update each achievement
-    for (const achievement of watchTimeAchievements) {
-      await this.updateAchievementProgress(userId, achievement.id, watchedSeconds)
-    }
-
-    return watchedSeconds
-  }
-}
-
-// Analytics Operations
-export const analyticsService = {
-  // Record daily platform analytics
-  async recordDailyAnalytics(date: Date) {
-    const startOfDay = new Date(date)
-    startOfDay.setHours(0, 0, 0, 0)
-    
-    const endOfDay = new Date(date)
-    endOfDay.setHours(23, 59, 59, 999)
-
-    // Calculate metrics for the day
-    const [
-      dailyActiveUsers,
-      newUsers,
-      totalUsers,
-      newVideos,
-      totalVideos,
-      totalSessions,
-      totalWatchTime,
-      revenueData
-    ] = await Promise.all([
-      // Daily active users
-      prisma.user.count({
-        where: {
-          lastLoginAt: {
-            gte: startOfDay,
-            lte: endOfDay
-          }
-        }
-      }),
-      // New users
-      prisma.user.count({
-        where: {
-          createdAt: {
-            gte: startOfDay,
-            lte: endOfDay
-          }
-        }
-      }),
-      // Total users
-      prisma.user.count(),
-      // New videos
-      prisma.video.count({
-        where: {
-          publishedAt: {
-            gte: startOfDay,
-            lte: endOfDay
-          }
-        }
-      }),
-      // Total videos
-      prisma.video.count({ where: { status: 'PUBLISHED' } }),
-      // Sessions
-      prisma.viewSession.count({
-        where: {
-          startTime: {
-            gte: startOfDay,
-            lte: endOfDay
-          }
-        }
-      }),
-      // Watch time
-      prisma.viewSession.aggregate({
-        where: {
-          startTime: {
-            gte: startOfDay,
-            lte: endOfDay
-          }
-        },
-        _sum: { watchedSeconds: true }
-      }),
-      // Revenue data
-      prisma.creatorEarning.aggregate({
-        where: {
-          createdAt: {
-            gte: startOfDay,
-            lte: endOfDay
-          }
-        },
-        _sum: { amount: true }
-      })
-    ])
-
-    const averageSessionLength = totalSessions > 0 
-      ? Math.round((totalWatchTime._sum.watchedSeconds || 0) / totalSessions)
-      : 0
-
-    return await prisma.platformAnalytics.upsert({
-      where: { date: startOfDay },
-      update: {
-        dailyActiveUsers,
-        newUsers,
-        totalUsers,
-        newVideos,
-        totalVideos,
-        totalSessions,
-        totalWatchTime: totalWatchTime._sum.watchedSeconds || 0,
-        averageSessionLength,
-        totalRevenue: revenueData._sum.amount || 0
-      },
-      create: {
-        date: startOfDay,
-        dailyActiveUsers,
-        newUsers,
-        totalUsers,
-        newVideos,
-        totalVideos,
-        totalSessions,
-        totalWatchTime: totalWatchTime._sum.watchedSeconds || 0,
-        averageSessionLength,
-        totalRevenue: revenueData._sum.amount || 0
-      }
-    })
-  },
-
-  // Get analytics dashboard data
-  async getDashboardData(days = 30) {
-    const endDate = new Date()
-    const startDate = new Date(endDate)
-    startDate.setDate(startDate.getDate() - days)
-
-    return await prisma.platformAnalytics.findMany({
-      where: {
-        date: {
-          gte: startDate,
-          lte: endDate
-        }
-      },
-      orderBy: { date: 'asc' }
     })
   }
 }

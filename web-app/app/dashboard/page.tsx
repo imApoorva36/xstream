@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "../components/Header";
 import { Name } from "@coinbase/onchainkit/identity";
 import { useAccount } from "wagmi";
@@ -27,23 +27,47 @@ import {
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const { address, isConnected } = useAccount();
+  const [userStats, setUserStats] = useState({
+    totalSpent: 0,
+    totalWatchTime: 0,
+    videosWatched: 0,
+    nftsEarned: 0,
+    favoriteCreators: 0
+  });
+  const [creatorStats, setCreatorStats] = useState({
+    totalEarned: 0,
+    totalViews: 0,
+    totalVideos: 0,
+    subscribers: 0,
+    avgViewDuration: 0
+  });
 
-  // Mock data - in real app this would come from API
-  const userStats = {
-    totalSpent: 23.45,
-    totalWatchTime: 1234, // minutes
-    videosWatched: 45,
-    nftsEarned: 8,
-    favoriteCreators: 12
-  };
-
-  const creatorStats = {
-    totalEarned: 456.78,
-    totalViews: 12500,
-    totalVideos: 15,
-    subscribers: 850,
-    avgViewDuration: 4.2 // minutes
-  };
+  // Fetch user stats when wallet connects
+  useEffect(() => {
+    if (address && isConnected) {
+      fetch(`/api/users/${address}/stats`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.stats) {
+            setUserStats({
+              totalSpent: data.stats.totalSpent || 0,
+              totalWatchTime: data.stats.totalWatchTime || 0,
+              videosWatched: data.viewSessions?.length || 0,
+              nftsEarned: 0,
+              favoriteCreators: 0
+            });
+            setCreatorStats({
+              totalEarned: data.stats.totalEarned || 0,
+              totalViews: data.stats.totalViews || 0,
+              totalVideos: data.stats.totalVideos || 0,
+              subscribers: 0,
+              avgViewDuration: 0
+            });
+          }
+        })
+        .catch(err => console.error('Failed to fetch stats:', err));
+    }
+  }, [address, isConnected]);
 
   const recentVideos = [
     {

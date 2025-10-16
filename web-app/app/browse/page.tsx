@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,9 +18,11 @@ import {
   Music,
   Newspaper,
   Trophy,
-  Film
+  Film,
+  Loader2
 } from "lucide-react";
 
+// Temporary mock data as fallback
 const mockVideos = [
   {
     id: "1",
@@ -156,6 +159,28 @@ const mockVideos = [
 ];
 
 export default function BrowsePage() {
+  const [videos, setVideos] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchVideos() {
+      try {
+        const response = await fetch('/api/videos?limit=12');
+        const data = await response.json();
+        setVideos(data.videos || []);
+      } catch (error) {
+        console.error('Failed to fetch videos:', error);
+        // Fallback to mock data if API fails
+        setVideos(mockVideos);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchVideos();
+  }, []);
+
+  const displayVideos = videos.length > 0 ? videos : mockVideos;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
       <Header />
@@ -231,11 +256,18 @@ export default function BrowsePage() {
             <p className="text-gray-300">Discover amazing content and pay per second</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {mockVideos.map((video) => (
-              <VideoCard key={video.id} video={video} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+              <span className="ml-3 text-white">Loading videos...</span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {displayVideos.map((video) => (
+                <VideoCard key={video.id} video={video} />
+              ))}
+            </div>
+          )}
         </main>
       </div>
     </div>
