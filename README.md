@@ -201,6 +201,137 @@ Visit **[http://localhost:3000](http://localhost:3000)** to explore xStream!
 
 ---
 
+## 🏗️ Backend Infrastructure
+
+### **Database Architecture**
+
+xStream uses a comprehensive PostgreSQL database with Prisma ORM to handle all non-Web3 operations, minimizing blockchain calls for better performance.
+
+#### **Core Models:**
+- **Users** — Profiles supporting both email/password and Web3 wallet authentication
+- **Videos** — Content metadata, pricing, analytics with multi-quality support
+- **ViewSessions** — Pay-per-second billing with real-time tracking
+- **Achievements** — NFT-backed milestone system with gamification
+- **CreatorEarnings** — Revenue tracking and payout management
+- **AdCampaigns** — Advertisement system with targeting and analytics
+- **PlatformAnalytics** — Business intelligence and performance metrics
+
+### **Authentication System**
+
+#### **Hybrid Authentication Support**
+
+```typescript
+// Email/Password Registration
+POST /api/auth/register
+{
+  "type": "email",
+  "email": "user@example.com", 
+  "password": "securePassword",
+  "username": "myUsername"
+}
+
+// Web3 Wallet Authentication
+POST /api/auth/register  
+{
+  "type": "wallet",
+  "walletAddress": "0x742d35cc...",
+  "signature": "0x...",
+  "message": "Welcome to xStream!...",
+  "nonce": "randomNonce123"
+}
+```
+
+### **API Endpoints**
+
+| Endpoint | Purpose |
+|----------|---------|
+| `/api/users` | User management and profiles |
+| `/api/videos` | Video CRUD with filtering/pagination |
+| `/api/sessions` | Pay-per-second viewing sessions |
+| `/api/achievements` | NFT achievement system |
+| `/api/analytics` | Platform analytics dashboard |
+| `/api/auth/*` | Complete authentication flow |
+
+### **Setup Instructions**
+
+```bash
+# Navigate to web app
+cd web-app
+
+# Install backend dependencies
+npm install
+
+# Copy environment configuration
+cp .env.example .env.local
+
+# Configure your database URL in .env.local
+DATABASE_URL="postgresql://username:password@localhost:5432/xstream"
+
+# Set authentication secrets
+JWT_SECRET="your-secure-jwt-secret"
+NEXTAUTH_SECRET="your-nextauth-secret"
+
+# Initialize database
+npm run db:push
+
+# Seed with sample data
+npm run db:seed
+
+# Start development server
+npm run dev
+```
+
+### **Database Commands**
+
+```bash
+npm run db:generate    # Generate Prisma client
+npm run db:push        # Push schema to database  
+npm run db:migrate     # Run migrations (development)
+npm run db:seed        # Seed database with sample data
+npm run db:reset       # Reset database and reseed
+npm run db:studio      # Open Prisma Studio
+```
+
+### **Sample Data Included**
+
+The seed script creates:
+- 10 achievements across different categories
+- 3 sample users (creator, viewer, advertiser)  
+- 3 sample videos with multiple quality options
+- 2 viewing sessions with billing data
+- 1 ad campaign with targeting
+- User stakes and creator earnings
+- Initial platform analytics
+
+### **Environment Variables**
+
+```bash
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/xstream"
+
+# Authentication  
+JWT_SECRET="your-jwt-secret"
+NEXTAUTH_SECRET="your-nextauth-secret"
+
+# Web3 Configuration
+NEXT_PUBLIC_CHAIN_ID="11155111"
+NEXT_PUBLIC_RPC_URL="https://sepolia.infura.io/v3/your-key"
+
+# Contract Addresses (fill after deployment)
+NEXT_PUBLIC_XSTREAM_CORE_ADDRESS=""
+NEXT_PUBLIC_XSTREAM_NFT_ADDRESS=""
+```
+
+### **Key Features**
+
+- **Hybrid Web2/Web3** — Database handles 95% of operations, blockchain only for payments/staking/minting
+- **Real-time Analytics** — Comprehensive tracking of users, content, and revenue  
+- **Achievement NFTs** — Gamification system with blockchain rewards
+- **Scalable Architecture** — Built with enterprise patterns for production use
+- **Security First** — JWT tokens, input validation, rate limiting
+
+---
+
 ## ✨ Join the Revolution
 
 **xStream** — Building the financial infrastructure for content creators worldwide.
