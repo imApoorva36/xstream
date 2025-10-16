@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sessionService, videoService, achievementService } from '@/lib/database'
+import { sessionService, videoService } from '@/lib/database'
 import { z } from 'zod'
 import { v4 as uuidv4 } from 'uuid'
 
 // Validation schemas
 const createSessionSchema = z.object({
   viewerId: z.string(),
-  videoId: z.string(),
-  stakedAmount: z.number().min(0),
-  qualityWatched: z.string(),
-  deviceType: z.string().optional(),
-  browserInfo: z.string().optional()
+  videoId: z.string()
 })
 
 const updateSessionSchema = z.object({
@@ -19,31 +15,23 @@ const updateSessionSchema = z.object({
   status: z.enum(['ACTIVE', 'COMPLETED', 'CANCELLED', 'EXPIRED']).optional()
 })
 
-// GET /api/sessions - Get user sessions or active session
+// GET /api/sessions - Get session by token
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const sessionToken = searchParams.get('sessionToken')
-    const userId = searchParams.get('userId')
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 50)
 
-    if (sessionToken) {
-      // Get specific session
-      const session = await sessionService.getActiveSession(sessionToken)
-      if (!session) {
-        return NextResponse.json({ error: 'Session not found' }, { status: 404 })
-      }
-      return NextResponse.json({ session })
+    if (!sessionToken) {
+      return NextResponse.json({ error: 'Session token is required' }, { status: 400 })
     }
 
-    if (userId) {
-      // Get user session history
-      const result = await sessionService.getUserSessions(userId, page, limit)
-      return NextResponse.json(result)
+    const session = await sessionService.getSession(sessionToken)
+    
+    if (!session) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 })
+    return NextResponse.json({ session })
   } catch (error) {
     console.error('Error in GET /api/sessions:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -56,25 +44,20 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = createSessionSchema.parse(body)
 
-    // Get client IP
-    const forwarded = request.headers.get('x-forwarded-for')
-    const ip = forwarded ? forwarded.split(',')[0] : request.headers.get('x-real-ip') || 'unknown'
-
     // Generate unique session token
     const sessionToken = uuidv4()
 
     const session = await sessionService.createSession({
-      ...validatedData,
       sessionToken,
-      ipAddress: ip
+      viewerId: validatedData.viewerId,
+      videoId: validatedData.videoId
     })
     
     return NextResponse.json({ session }, { status: 201 })
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ 
-        error: 'Validation error', 
-        details: error.errors 
+        error: 'Validation error'
       }, { status: 400 })
     }
 
@@ -90,34 +73,29 @@ export async function PATCH(request: NextRequest) {
     const { sessionToken, watchedSeconds, status } = updateSessionSchema.parse(body)
 
     // Get current session
-    const currentSession = await sessionService.getActiveSession(sessionToken)
+    const currentSession = await sessionService.getSession(sessionToken)
     if (!currentSession) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
 
-    // Calculate billing if watchedSeconds provided
-    let updateData: any = { status }
+    // Update session with new data
+    const updateData: any = {}
     
     if (watchedSeconds !== undefined) {
-      const pricePerSecond = Number(currentSession.video.pricePerSecond)
-      const amountCharged = watchedSeconds * pricePerSecond
+      updateData.watchedSeconds = watchedSeconds
       
-      updateData = {
-        ...updateData,
-        watchedSeconds,
-        amountCharged,
-        endTime: status === 'COMPLETED' ? new Date() : undefined
+      // Calculate amount charged based on video price
+      const video = await videoService.getVideoById(currentSession.videoId)
+      if (video) {
+        const pricePerSecond = Number(video.pricePerSecond)
+        updateData.amountCharged = watchedSeconds * pricePerSecond
       }
-
-      // Update video analytics
-      await videoService.updateVideoStats(currentSession.video.id, {
-        watchTimeIncrement: watchedSeconds - currentSession.watchedSeconds,
-        earningsIncrement: amountCharged - Number(currentSession.amountCharged)
-      })
-
-      // Check achievements for watch time
+    }
+    
+    if (status !== undefined) {
+      updateData.status = status
       if (status === 'COMPLETED') {
-        await achievementService.checkWatchTimeAchievements(currentSession.viewerId)
+        updateData.endTime = new Date()
       }
     }
 
@@ -127,8 +105,7 @@ export async function PATCH(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ 
-        error: 'Validation error', 
-        details: error.errors 
+        error: 'Validation error'
       }, { status: 400 })
     }
 

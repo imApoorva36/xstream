@@ -35,6 +35,8 @@ export default function UploadPage() {
   const [maxQuality, setMaxQuality] = useState("1080p");
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [category, setCategory] = useState("Education");
 
   const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -45,12 +47,63 @@ export default function UploadPage() {
   };
 
   const handleSubmit = async () => {
+    if (!address || !isConnected) {
+      setUploadError("Please connect your wallet first");
+      return;
+    }
+
+    if (!videoFile) {
+      setUploadError("Please select a video file");
+      return;
+    }
+
     setIsUploading(true);
-    // Here you would integrate with your upload API and x402 for the upload fee
-    setTimeout(() => {
-      setIsUploading(false);
+    setUploadError(null);
+
+    try {
+      // For now, we'll use placeholder URLs since actual file upload requires a storage service
+      // In production, you'd upload to IPFS, Arweave, or cloud storage first
+      const videoUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+      const thumbnailUrl = thumbnail 
+        ? URL.createObjectURL(thumbnail)
+        : "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=640&h=360&fit=crop";
+
+      // Get video duration (mock for now - would use actual video metadata)
+      const videoDuration = 300; // 5 minutes in seconds
+
+      const response = await fetch('/api/videos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: title.trim(),
+          description: description.trim() || undefined,
+          videoUrl,
+          thumbnailUrl,
+          duration: videoDuration,
+          pricePerSecond: parseFloat(pricePerSecond),
+          category,
+          tags: tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+          creatorId: address,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to upload video');
+      }
+
+      const data = await response.json();
+      console.log('Video uploaded successfully:', data);
+      
       setUploadStep(5);
-    }, 3000);
+    } catch (error) {
+      console.error('Upload error:', error);
+      setUploadError(error instanceof Error ? error.message : 'Failed to upload video');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const calculateVideoCost = () => {
@@ -227,6 +280,25 @@ export default function UploadPage() {
                 </div>
 
                 <div>
+                  <label className="block text-sm font-medium mb-2">Category</label>
+                  <Select value={category} onValueChange={setCategory}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Education">Education</SelectItem>
+                      <SelectItem value="Technology">Technology</SelectItem>
+                      <SelectItem value="Entertainment">Entertainment</SelectItem>
+                      <SelectItem value="Gaming">Gaming</SelectItem>
+                      <SelectItem value="Music">Music</SelectItem>
+                      <SelectItem value="News">News</SelectItem>
+                      <SelectItem value="Sports">Sports</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
                   <label className="block text-sm font-medium mb-2">Thumbnail</label>
                   <input
                     type="file"
@@ -397,13 +469,30 @@ export default function UploadPage() {
                 </ul>
               </div>
 
+              {/* Error Message */}
+              {uploadError && (
+                <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                  <div className="flex items-start space-x-2">
+                    <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-medium text-red-700 dark:text-red-300">
+                        Upload Failed
+                      </h4>
+                      <p className="text-sm text-red-600 dark:text-red-400">
+                        {uploadError}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="flex justify-between">
                 <Button variant="outline" onClick={() => setUploadStep(3)}>
                   Back
                 </Button>
                 <Button 
                   onClick={handleSubmit}
-                  disabled={isUploading}
+                  disabled={isUploading || !isConnected}
                   className="bg-green-600 hover:bg-green-700"
                 >
                   {isUploading ? (
@@ -411,6 +500,8 @@ export default function UploadPage() {
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                       Publishing...
                     </>
+                  ) : !isConnected ? (
+                    <>Connect Wallet to Publish</>
                   ) : (
                     <>
                       <Zap className="h-4 w-4 mr-2" />
@@ -439,12 +530,26 @@ export default function UploadPage() {
                 <p className="text-gray-300 mb-6">
                   Your video is now live on xStream and ready for viewers to watch and pay per second.
                 </p>
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6 text-sm">
+                  <p className="text-gray-600 dark:text-gray-400">
+                    <strong>Note:</strong> In this demo, a sample video URL is used. In production, your actual video file would be uploaded to decentralized storage (IPFS/Arweave) or cloud storage.
+                  </p>
+                </div>
                 <div className="flex justify-center space-x-4">
-                  <Button variant="outline" className="text-white border-white/20 hover:bg-white/10">
-                    <Eye className="h-4 w-4 mr-2" />
-                    View Video
-                  </Button>
-                  <Button onClick={() => { setUploadStep(1); setVideoFile(null); setTitle(""); }} className="bg-blue-600 hover:bg-blue-700">
+                  <Link href="/browse">
+                    <Button variant="outline" className="text-white border-white/20 hover:bg-white/10">
+                      <Eye className="h-4 w-4 mr-2" />
+                      Browse Videos
+                    </Button>
+                  </Link>
+                  <Button onClick={() => { 
+                    setUploadStep(1); 
+                    setVideoFile(null); 
+                    setTitle(""); 
+                    setDescription("");
+                    setTags("");
+                    setUploadError(null);
+                  }} className="bg-blue-600 hover:bg-blue-700">
                     Upload Another
                   </Button>
                 </div>
