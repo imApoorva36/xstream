@@ -39,8 +39,8 @@ contract XStreamFactory is Ownable {
         XStreamNFT nftContract = new XStreamNFT(xstreamCore);
         xstreamNFT = address(nftContract);
 
-        // Deploy XStreamAds with references to treasury and XStreamCore
-        XStreamAds adsContract = new XStreamAds(treasury, xstreamCore);
+        // Deploy XStreamAds with treasury reference only
+        XStreamAds adsContract = new XStreamAds(treasury);
         xstreamAds = address(adsContract);
 
         deployedAt = block.timestamp;
