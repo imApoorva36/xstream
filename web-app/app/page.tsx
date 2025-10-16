@@ -69,12 +69,12 @@ export default function Home() {
           <div className="text-center space-y-8">
             <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 px-4 py-2">
               <Sparkles className="w-4 h-4 mr-2" />
-              Pay-Per-Second Streaming
+              Revolutionary Web3 Video Platform
             </Badge>
             
             <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold leading-tight">
               <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                Stream Content.
+                Watch Videos.
               </span>
               <br />
               <span className="text-white">
@@ -83,8 +83,8 @@ export default function Home() {
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
-              Revolutionary Web3 platform where viewers pay only for what they watch, 
-              and creators keep <span className="text-blue-400 font-semibold">95%</span> of earnings.
+              Pay only for the exact seconds you watch. Creators receive instant compensation 
+              with <span className="text-blue-400 font-semibold">95% revenue share</span> and transparent blockchain verification.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
@@ -227,7 +227,7 @@ export default function Home() {
               Ready to Transform Video Monetization?
             </h2>
             <p className="text-xl text-gray-300 mb-8">
-              Join thousands of creators and viewers building the future of content streaming.
+              Join thousands of creators and viewers building the future of video monetization.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/browse">
