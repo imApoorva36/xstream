@@ -69,45 +69,9 @@ export default function DashboardPage() {
     }
   }, [address, isConnected]);
 
-  const recentVideos = [
-    {
-      id: "1",
-      title: "Introduction to x402 Micropayments",
-      views: 1250,
-      earned: 25.60,
-      duration: "10:30",
-      uploadDate: "2 days ago"
-    },
-    {
-      id: "2",
-      title: "Building on Base Blockchain",
-      views: 890,
-      earned: 18.20,
-      duration: "8:45",
-      uploadDate: "1 week ago"
-    }
-  ];
-
-  const recentActivity = [
-    {
-      type: "watch",
-      description: "Watched 'NFT Rewards Guide'",
-      amount: -0.45,
-      time: "2 hours ago"
-    },
-    {
-      type: "earn",
-      description: "Earned from 'Crypto Tutorial'",
-      amount: 2.30,
-      time: "5 hours ago"
-    },
-    {
-      type: "nft",
-      description: "Earned 'Early Adopter' NFT",
-      amount: 0,
-      time: "1 day ago"
-    }
-  ];
+  // Note: These are placeholders - in a full implementation, fetch from API
+  const recentVideos: any[] = [];
+  const recentActivity: any[] = [];
 
   const nftMilestones = [
     { name: "First Video", description: "Watched your first video", earned: true, icon: "🎬" },

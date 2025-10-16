@@ -13,14 +13,14 @@ export async function GET(
   try {
     const { id } = params
     
-    const video = await videoService.getVideoWithCreator(id)
+    const video = await videoService.getVideoById(id)
     
     if (!video) {
       return NextResponse.json({ error: 'Video not found' }, { status: 404 })
     }
 
     // Increment view count (basic analytics)
-    await videoService.updateVideoStats(id, { viewsIncrement: 1 })
+    await videoService.updateStats(id, { totalViews: 1 })
     
     return NextResponse.json({ video })
   } catch (error) {

@@ -161,25 +161,26 @@ const mockVideos = [
 export default function BrowsePage() {
   const [videos, setVideos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchVideos() {
       try {
         const response = await fetch('/api/videos?limit=12');
+        if (!response.ok) {
+          throw new Error('Failed to fetch videos');
+        }
         const data = await response.json();
         setVideos(data.videos || []);
       } catch (error) {
         console.error('Failed to fetch videos:', error);
-        // Fallback to mock data if API fails
-        setVideos(mockVideos);
+        setError('Unable to load videos. Please try again later.');
       } finally {
         setLoading(false);
       }
     }
     fetchVideos();
   }, []);
-
-  const displayVideos = videos.length > 0 ? videos : mockVideos;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
@@ -261,9 +262,24 @@ export default function BrowsePage() {
               <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
               <span className="ml-3 text-white">Loading videos...</span>
             </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <p className="text-white text-lg mb-4">{error}</p>
+              <Button onClick={() => window.location.reload()}>
+                Try Again
+              </Button>
+            </div>
+          ) : videos.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <p className="text-white text-lg mb-2">No videos found</p>
+              <p className="text-gray-400 mb-4">Be the first to upload content!</p>
+              <Button onClick={() => window.location.href = '/upload'}>
+                Upload Video
+              </Button>
+            </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {displayVideos.map((video) => (
+              {videos.map((video: any) => (
                 <VideoCard key={video.id} video={video} />
               ))}
             </div>
