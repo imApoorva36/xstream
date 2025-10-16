@@ -203,43 +203,81 @@
     pointer-events: none !important;
   }
 }
-/* RainbowKit Custom Theme - Blue Theme to match xStream */
+/* OnchainKit Custom Theme - Blue Theme to match xStream */
 :root {
-  --rk-colors-accentColor: #3b82f6;
-  --rk-colors-accentColorForeground: #ffffff;
-  --rk-colors-actionButtonBorder: rgba(59, 130, 246, 0.2);
-  --rk-colors-actionButtonBorderMobile: rgba(59, 130, 246, 0.2);
-  --rk-colors-actionButtonSecondaryBackground: rgba(59, 130, 246, 0.1);
-  --rk-colors-closeButton: rgba(255, 255, 255, 0.7);
-  --rk-colors-closeButtonBackground: rgba(59, 130, 246, 0.1);
-  --rk-colors-connectButtonBackground: linear-gradient(to right, #3b82f6, #2563eb);
-  --rk-colors-connectButtonBackgroundError: #ef4444;
-  --rk-colors-connectButtonInnerBackground: linear-gradient(to right, #3b82f6, #2563eb);
-  --rk-colors-connectButtonText: #ffffff;
-  --rk-colors-connectButtonTextError: #ffffff;
-  --rk-colors-connectionIndicator: #22c55e;
-  --rk-colors-downloadBottomCardBackground: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 58, 138, 0.95) 100%);
-  --rk-colors-downloadTopCardBackground: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 58, 138, 0.98) 100%);
-  --rk-colors-error: #ef4444;
-  --rk-colors-generalBorder: rgba(59, 130, 246, 0.2);
-  --rk-colors-generalBorderDim: rgba(59, 130, 246, 0.1);
-  --rk-colors-menuItemBackground: rgba(59, 130, 246, 0.05);
-  --rk-colors-modalBackdrop: rgba(0, 0, 0, 0.7);
-  --rk-colors-modalBackground: #0f172a;
-  --rk-colors-modalBorder: rgba(59, 130, 246, 0.2);
-  --rk-colors-modalText: #ffffff;
-  --rk-colors-modalTextDim: rgba(255, 255, 255, 0.6);
-  --rk-colors-modalTextSecondary: rgba(255, 255, 255, 0.7);
-  --rk-colors-profileAction: rgba(59, 130, 246, 0.1);
-  --rk-colors-profileActionHover: rgba(59, 130, 246, 0.2);
-  --rk-colors-profileForeground: rgba(15, 23, 42, 0.9);
-  --rk-colors-selectedOptionBorder: #3b82f6;
-  --rk-colors-standby: #fbbf24;
-  --rk-radii-actionButton: 0.75rem;
-  --rk-radii-connectButton: 0.75rem;
-  --rk-radii-menuButton: 0.75rem;
-  --rk-radii-modal: 1rem;
-  --rk-radii-modalMobile: 1rem;
-  --rk-fonts-body: inherit;
-  --rk-blurs-modalOverlay: blur(8px);
+  --ock-bg-default: #0f172a;
+  --ock-bg-default-hover: rgba(59, 130, 246, 0.1);
+  --ock-bg-default-active: rgba(59, 130, 246, 0.2);
+  --ock-bg-alternate: rgba(15, 23, 42, 0.95);
+  --ock-bg-alternate-hover: rgba(30, 58, 138, 0.3);
+  --ock-bg-alternate-active: rgba(30, 58, 138, 0.5);
+  --ock-bg-inverse: #ffffff;
+  --ock-bg-primary: #3b82f6;
+  --ock-bg-primary-hover: #2563eb;
+  --ock-bg-primary-active: #1d4ed8;
+  --ock-bg-secondary: rgba(59, 130, 246, 0.1);
+  --ock-bg-secondary-hover: rgba(59, 130, 246, 0.2);
+  --ock-bg-secondary-active: rgba(59, 130, 246, 0.3);
+  --ock-text-default: #ffffff;
+  --ock-text-foreground: #ffffff;
+  --ock-text-foreground-muted: rgba(255, 255, 255, 0.7);
+  --ock-text-inverse: #0f172a;
+  --ock-text-primary: #3b82f6;
+  --ock-text-secondary: rgba(255, 255, 255, 0.6);
+  --ock-text-error: #ef4444;
+  --ock-text-success: #22c55e;
+  --ock-border-default: rgba(59, 130, 246, 0.2);
+  --ock-border-active: #3b82f6;
+}
+
+/* OnchainKit Component Overrides */
+.ock-wallet-button {
+  background: linear-gradient(to right, #3b82f6, #2563eb) !important;
+  color: white !important;
+  border-radius: 0.75rem !important;
+  padding: 0.5rem 1rem !important;
+  font-weight: 500 !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  transition: all 0.2s ease !important;
+}
+
+.ock-wallet-button:hover {
+  background: linear-gradient(to right, #2563eb, #1d4ed8) !important;
+  border-color: rgba(59, 130, 246, 0.5) !important;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3) !important;
+}
+
+.ock-wallet-dropdown {
+  background: rgba(15, 23, 42, 0.98) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(59, 130, 246, 0.2) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+}
+
+.ock-wallet-dropdown-link:hover,
+.ock-wallet-dropdown-disconnect:hover {
+  background: rgba(59, 130, 246, 0.1) !important;
+}
+
+.ock-identity {
+  border-bottom: 1px solid rgba(59, 130, 246, 0.1) !important;
+}
+
+.ock-avatar {
+  border: 2px solid #3b82f6 !important;
+}
+
+.ock-text-name {
+  color: #3b82f6 !important;
+  font-weight: 600 !important;
+}
+
+.ock-text-address {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.ock-text-balance {
+  color: #22c55e !important;
+  font-weight: 500 !important;
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Wallet, ConnectWallet } from "@coinbase/onchainkit/wallet";
+import { Avatar, Name } from "@coinbase/onchainkit/identity";
 import { useState } from "react";
 import { verifyPayment } from "../actions";
 import { PaymentRequirements, PaymentPayload } from "x402/types";
@@ -21,7 +22,12 @@ function PaymentForm({
   if (!address || !isConnected) {
     return (
       <div className="flex flex-col items-center gap-4">
-        <ConnectButton />
+        <Wallet>
+          <ConnectWallet>
+            <Avatar className="h-6 w-6" />
+            <Name />
+          </ConnectWallet>
+        </Wallet>
         <p className="text-white">Please connect your wallet to proceed with payment.</p>
       </div>
     );

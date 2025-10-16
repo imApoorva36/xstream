@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Header from "../components/Header";
-import { useConnectedDisplayName } from "../hooks/useDisplayName";
+import { Name } from "@coinbase/onchainkit/identity";
 import { useAccount } from "wagmi";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,6 @@ import {
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const { address, isConnected } = useAccount();
-  const { displayName, isLoading } = useConnectedDisplayName();
 
   // Mock data - in real app this would come from API
   const userStats = {
@@ -101,8 +100,8 @@ export default function DashboardPage() {
       <div className="container mx-auto px-4 py-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
-            {isConnected && !isLoading && displayName ? (
-              <>Welcome back, {displayName}! 👋</>
+            {isConnected && address ? (
+              <>Welcome back, <Name address={address} className="text-blue-400" />! 👋</>
             ) : (
               <>Dashboard</>
             )}

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Header from "../components/Header";
-import { useConnectedDisplayName } from "../hooks/useDisplayName";
+import { Name } from "@coinbase/onchainkit/identity";
 import { useAccount } from "wagmi";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,8 +26,7 @@ import {
 
 export default function UploadPage() {
   const [uploadStep, setUploadStep] = useState(1);
-  const { displayName, isLoading } = useConnectedDisplayName();
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -431,8 +430,8 @@ export default function UploadPage() {
               <CardContent className="p-8 text-center">
                 <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-600" />
                 <h3 className="text-2xl font-bold text-white mb-2">
-                  {isConnected && !isLoading && displayName ? (
-                    <>🎉 Congratulations, {displayName}!</>
+                  {isConnected && address ? (
+                    <>🎉 Congratulations, <Name address={address} className="text-blue-400" />!</>
                   ) : (
                     <>Video Published Successfully!</>
                   )}
