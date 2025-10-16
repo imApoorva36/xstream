@@ -1,0 +1,383 @@
+// xStream Database Schema
+// Comprehensive schema for pay-per-second video monetization platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id            String   @id @default(cuid())
+  email         String?  @unique
+  username      String?  @unique
+  displayName   String?
+  profileImage  String?
+  bio           String?
+  
+  // Web3 Integration
+  walletAddress String?  @unique
+  ensName       String?
+  
+  // Authentication
+  emailVerified Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  lastLoginAt   DateTime?
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  videos        Video[]
+  viewSessions  ViewSession[]
+  stakes        UserStake[]
+  achievements  UserAchievement[]
+  adCampaigns   AdCampaign[]
+  earnings      CreatorEarning[]
+  
+  @@map("users")
+}
+
+// Video Content Management
+model Video {
+  id                String   @id @default(cuid())
+  title             String
+  description       String?
+  
+  // Video File Information
+  videoUrl          String
+  thumbnailUrl      String
+  duration          Int      // Duration in seconds
+  fileSize          BigInt?  // File size in bytes
+  
+  // Quality and Encoding
+  qualities         VideoQuality[]
+  originalQuality   String   // 720p, 1080p, 4K
+  
+  // Pricing
+  pricePerSecond    Decimal  @db.Decimal(18, 8) // Price in ETH/wei
+  totalEarnings     Decimal  @default(0) @db.Decimal(18, 8)
+  
+  // Metadata
+  category          String?
+  tags              String[]
+  language          String   @default("en")
+  isAdultContent    Boolean  @default(false)
+  
+  // Status
+  status            VideoStatus @default(PROCESSING)
+  isActive          Boolean  @default(true)
+  isFeatured        Boolean  @default(false)
+  
+  // Analytics
+  totalViews        Int      @default(0)
+  totalWatchTime    Int      @default(0) // Total seconds watched
+  uniqueViewers     Int      @default(0)
+  
+  // Creator Information
+  creatorId         String
+  creator           User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  publishedAt       DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  viewSessions      ViewSession[]
+  
+  @@map("videos")
+}
+
+model VideoQuality {
+  id       String @id @default(cuid())
+  videoId  String
+  quality  String // "720p", "1080p", "4K"
+  url      String
+  fileSize BigInt
+  bitrate  Int
+  
+  video    Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  
+  @@unique([videoId, quality])
+  @@map("video_qualities")
+}
+
+// Viewing Sessions & Analytics
+model ViewSession {
+  id               String   @id @default(cuid())
+  
+  // Session Details
+  sessionToken     String   @unique
+  startTime        DateTime @default(now())
+  endTime          DateTime?
+  watchedSeconds   Int      @default(0)
+  
+  // Billing
+  stakedAmount     Decimal  @db.Decimal(18, 8)
+  amountCharged    Decimal  @default(0) @db.Decimal(18, 8)
+  refundAmount     Decimal  @default(0) @db.Decimal(18, 8)
+  
+  // Status
+  status           SessionStatus @default(ACTIVE)
+  
+  // Quality Watched
+  qualityWatched   String   // Quality level user watched
+  
+  // Device/Browser Info
+  deviceType       String?
+  browserInfo      String?
+  ipAddress        String?
+  location         String?
+  
+  // Relations
+  viewerId         String
+  viewer           User     @relation(fields: [viewerId], references: [id], onDelete: Cascade)
+  videoId          String
+  video            Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  
+  @@map("view_sessions")
+}
+
+// Creator Economics
+model CreatorEarning {
+  id             String   @id @default(cuid())
+  amount         Decimal  @db.Decimal(18, 8)
+  source         EarningSource
+  
+  // Transaction Details
+  txHash         String?  // Blockchain transaction hash
+  status         EarningStatus @default(PENDING)
+  
+  // Reference
+  referenceId    String?  // Could be videoId, sessionId, etc.
+  description    String?
+  
+  creatorId      String
+  creator        User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  
+  createdAt      DateTime @default(now())
+  paidAt         DateTime?
+  
+  @@map("creator_earnings")
+}
+
+// Staking System
+model UserStake {
+  id            String   @id @default(cuid())
+  amount        Decimal  @db.Decimal(18, 8)
+  status        StakeStatus @default(ACTIVE)
+  
+  // Transaction Info
+  depositTxHash String?
+  withdrawTxHash String?
+  
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime @default(now())
+  withdrawnAt   DateTime?
+  
+  @@map("user_stakes")
+}
+
+// Achievement System (NFT tracking)
+model Achievement {
+  id              String   @id @default(cuid())
+  name            String
+  description     String
+  category        AchievementCategory
+  threshold       Int      // Threshold to earn (e.g., 600 seconds for 10min milestone)
+  imageUrl        String
+  
+  // NFT Metadata
+  metadataUri     String?  // IPFS URI for NFT metadata
+  utilityLevel    Int      @default(1) // 1-5 utility level
+  
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  
+  // Relations
+  userAchievements UserAchievement[]
+  
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id              String   @id @default(cuid())
+  
+  // Achievement Progress
+  currentValue    Int      @default(0)
+  isEarned        Boolean  @default(false)
+  earnedAt        DateTime?
+  
+  // NFT Information
+  tokenId         String?  // On-chain NFT token ID
+  mintTxHash      String?  // Transaction hash of minting
+  
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId   String
+  achievement     Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime @default(now())
+  
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+// Advertisement System
+model AdCampaign {
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  
+  // Campaign Content
+  adContentUrl      String   // URL to ad content (video/image)
+  targetUrl         String?  // Click-through URL
+  
+  // Budget & Pricing
+  totalBudget       Decimal  @db.Decimal(18, 8)
+  remainingBudget   Decimal  @db.Decimal(18, 8)
+  pricePerView      Decimal  @db.Decimal(18, 8)
+  pricePerClick     Decimal  @db.Decimal(18, 8)
+  
+  // Targeting
+  targetCategories  String[]
+  targetAgeMin      Int?
+  targetAgeMax      Int?
+  targetCountries   String[]
+  
+  // Campaign Status
+  status            CampaignStatus @default(DRAFT)
+  startDate         DateTime?
+  endDate           DateTime?
+  
+  // Analytics
+  totalViews        Int      @default(0)
+  totalClicks       Int      @default(0)
+  totalSpent        Decimal  @default(0) @db.Decimal(18, 8)
+  
+  advertiserId      String
+  advertiser        User     @relation(fields: [advertiserId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  adViews           AdView[]
+  
+  @@map("ad_campaigns")
+}
+
+model AdView {
+  id              String   @id @default(cuid())
+  
+  // View Details
+  wasSkipped      Boolean  @default(false)
+  watchTime       Int      @default(0) // Seconds watched before skip
+  wasClicked      Boolean  @default(false)
+  
+  // Payment
+  paymentAmount   Decimal  @db.Decimal(18, 8)
+  
+  // Device/Location
+  deviceType      String?
+  location        String?
+  
+  campaignId      String
+  campaign        AdCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  
+  viewerId        String?  // Nullable for anonymous views
+  viewer          User?    @relation(fields: [viewerId], references: [id], onDelete: SetNull)
+  
+  viewedAt        DateTime @default(now())
+  
+  @@map("ad_views")
+}
+
+// Platform Analytics
+model PlatformAnalytics {
+  id                    String   @id @default(cuid())
+  date                  DateTime @unique @db.Date
+  
+  // User Metrics
+  dailyActiveUsers      Int      @default(0)
+  newUsers              Int      @default(0)
+  totalUsers            Int      @default(0)
+  
+  // Content Metrics
+  newVideos             Int      @default(0)
+  totalVideos           Int      @default(0)
+  totalWatchTime        Int      @default(0)
+  
+  // Revenue Metrics
+  totalRevenue          Decimal  @default(0) @db.Decimal(18, 8)
+  creatorRevenue        Decimal  @default(0) @db.Decimal(18, 8)
+  platformRevenue       Decimal  @default(0) @db.Decimal(18, 8)
+  adRevenue             Decimal  @default(0) @db.Decimal(18, 8)
+  
+  // Engagement Metrics
+  averageSessionLength  Int      @default(0)
+  totalSessions         Int      @default(0)
+  
+  createdAt             DateTime @default(now())
+  
+  @@map("platform_analytics")
+}
+
+// Enums
+enum VideoStatus {
+  PROCESSING
+  PUBLISHED
+  UNPUBLISHED
+  DELETED
+}
+
+enum SessionStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum EarningSource {
+  VIDEO_VIEWS
+  AD_REVENUE
+  BONUS
+  REFERRAL
+}
+
+enum EarningStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+}
+
+enum StakeStatus {
+  ACTIVE
+  WITHDRAWN
+  LOCKED
+}
+
+enum AchievementCategory {
+  WATCH_TIME
+  SPENDING
+  CREATOR_UPLOAD
+  CREATOR_EARNINGS
+  PLATFORM_LOYALTY
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
