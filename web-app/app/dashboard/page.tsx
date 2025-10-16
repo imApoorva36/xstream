@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Header from "../components/Header";
+import { useConnectedDisplayName } from "../hooks/useDisplayName";
+import { useAccount } from "wagmi";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +26,8 @@ import {
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
+  const { address, isConnected } = useAccount();
+  const { displayName, isLoading } = useConnectedDisplayName();
 
   // Mock data - in real app this would come from API
   const userStats = {
@@ -97,7 +101,11 @@ export default function DashboardPage() {
       <div className="container mx-auto px-4 py-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
-            Dashboard
+            {isConnected && !isLoading && displayName ? (
+              <>Welcome back, {displayName}! 👋</>
+            ) : (
+              <>Dashboard</>
+            )}
           </h1>
           <p className="text-gray-300">
             Track your xStream activity and earnings

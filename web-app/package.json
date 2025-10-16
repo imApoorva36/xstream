@@ -18,7 +18,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
-    "@coinbase/onchainkit": "latest",
+    "@coinbase/onchainkit": "^1.1.1",
     "@farcaster/miniapp-sdk": "^0.2.0",
     "@prisma/client": "^6.17.1",
     "@radix-ui/react-avatar": "^1.1.10",
@@ -29,6 +29,7 @@
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tabs": "^1.1.13",
+    "@rainbow-me/rainbowkit": "^2.2.9",
     "@react-native-async-storage/async-storage": "^1.24.0",
     "@tanstack/react-query": "^5",
     "@types/bcryptjs": "^2.4.6",
@@ -47,8 +48,9 @@
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
+    "thirdweb": "^5.108.15",
     "uuid": "^13.0.0",
-    "viem": "^2.21.26",
+    "viem": "^2.38.2",
     "wagmi": "^2.15.6",
     "x402-next": "^0.6.5",
     "zod": "^4.1.12"

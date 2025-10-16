@@ -203,3 +203,43 @@
     pointer-events: none !important;
   }
 }
+/* RainbowKit Custom Theme - Blue Theme to match xStream */
+:root {
+  --rk-colors-accentColor: #3b82f6;
+  --rk-colors-accentColorForeground: #ffffff;
+  --rk-colors-actionButtonBorder: rgba(59, 130, 246, 0.2);
+  --rk-colors-actionButtonBorderMobile: rgba(59, 130, 246, 0.2);
+  --rk-colors-actionButtonSecondaryBackground: rgba(59, 130, 246, 0.1);
+  --rk-colors-closeButton: rgba(255, 255, 255, 0.7);
+  --rk-colors-closeButtonBackground: rgba(59, 130, 246, 0.1);
+  --rk-colors-connectButtonBackground: linear-gradient(to right, #3b82f6, #2563eb);
+  --rk-colors-connectButtonBackgroundError: #ef4444;
+  --rk-colors-connectButtonInnerBackground: linear-gradient(to right, #3b82f6, #2563eb);
+  --rk-colors-connectButtonText: #ffffff;
+  --rk-colors-connectButtonTextError: #ffffff;
+  --rk-colors-connectionIndicator: #22c55e;
+  --rk-colors-downloadBottomCardBackground: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 58, 138, 0.95) 100%);
+  --rk-colors-downloadTopCardBackground: linear-gradient(135deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 58, 138, 0.98) 100%);
+  --rk-colors-error: #ef4444;
+  --rk-colors-generalBorder: rgba(59, 130, 246, 0.2);
+  --rk-colors-generalBorderDim: rgba(59, 130, 246, 0.1);
+  --rk-colors-menuItemBackground: rgba(59, 130, 246, 0.05);
+  --rk-colors-modalBackdrop: rgba(0, 0, 0, 0.7);
+  --rk-colors-modalBackground: #0f172a;
+  --rk-colors-modalBorder: rgba(59, 130, 246, 0.2);
+  --rk-colors-modalText: #ffffff;
+  --rk-colors-modalTextDim: rgba(255, 255, 255, 0.6);
+  --rk-colors-modalTextSecondary: rgba(255, 255, 255, 0.7);
+  --rk-colors-profileAction: rgba(59, 130, 246, 0.1);
+  --rk-colors-profileActionHover: rgba(59, 130, 246, 0.2);
+  --rk-colors-profileForeground: rgba(15, 23, 42, 0.9);
+  --rk-colors-selectedOptionBorder: #3b82f6;
+  --rk-colors-standby: #fbbf24;
+  --rk-radii-actionButton: 0.75rem;
+  --rk-radii-connectButton: 0.75rem;
+  --rk-radii-menuButton: 0.75rem;
+  --rk-radii-modal: 1rem;
+  --rk-radii-modalMobile: 1rem;
+  --rk-fonts-body: inherit;
+  --rk-blurs-modalOverlay: blur(8px);
+}

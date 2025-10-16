@@ -2,24 +2,18 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  ConnectWallet,
-  Wallet,
-  WalletDropdown,
-  WalletDropdownLink,
-  WalletDropdownDisconnect,
-} from "@coinbase/onchainkit/wallet";
-import {
-  Address,
-  Avatar,
-  Name,
-  Identity,
-  EthBalance,
-} from "@coinbase/onchainkit/identity";
-import { Search, Upload as UploadIcon, Play, TrendingUp, Home, LayoutDashboard, Wallet as WalletIcon, Target } from "lucide-react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
+import { useDisplayName } from "../hooks/useDisplayName";
+import { Search, Upload as UploadIcon, Play, TrendingUp, Home, LayoutDashboard, Target } from "lucide-react";
 import Link from "next/link";
 
 export default function Header() {
+  const { address } = useAccount();
+  
+  // Use our custom hook that resolves basename first, then ENS
+  const { displayName: resolvedName } = useDisplayName(address);
+
   return (
     <header className="sticky top-0 z-50 bg-black/20 backdrop-blur-lg border-b border-white/10">
       <div className="px-6 py-4 flex items-center justify-between">
@@ -82,35 +76,107 @@ export default function Header() {
             </Button>
           </Link>
           
-          <div className="wallet-container">
-            <Wallet>
-              <ConnectWallet className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
-                <WalletIcon className="w-4 h-4 mr-2" />
-                <span>Connect</span>
-              </ConnectWallet>
-              <WalletDropdown>
-                <Identity className="px-4 pt-3 pb-2" hasCopyAddressOnClick>
-                  <Avatar />
-                  <Name />
-                  <Address />
-                  <EthBalance />
-                </Identity>
-                <WalletDropdownLink
-                  icon="wallet"
-                  href="https://keys.coinbase.com"
+          <ConnectButton.Custom>
+            {({
+              account,
+              chain,
+              openAccountModal,
+              openChainModal,
+              openConnectModal,
+              authenticationStatus,
+              mounted,
+            }) => {
+              const ready = mounted && authenticationStatus !== 'loading';
+              const connected =
+                ready &&
+                account &&
+                chain &&
+                (!authenticationStatus ||
+                  authenticationStatus === 'authenticated');
+
+              return (
+                <div
+                  {...(!ready && {
+                    'aria-hidden': true,
+                    style: {
+                      opacity: 0,
+                      pointerEvents: 'none',
+                      userSelect: 'none',
+                    },
+                  })}
                 >
-                  Wallet
-                </WalletDropdownLink>
-                <WalletDropdownLink
-                  icon="wallet"
-                  href="/dashboard"
-                >
-                  Dashboard
-                </WalletDropdownLink>
-                <WalletDropdownDisconnect />
-              </WalletDropdown>
-            </Wallet>
-          </div>
+                  {(() => {
+                    if (!connected) {
+                      return (
+                        <Button
+                          onClick={openConnectModal}
+                          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                        >
+                          Connect Wallet
+                        </Button>
+                      );
+                    }
+
+                    if (chain.unsupported) {
+                      return (
+                        <Button onClick={openChainModal} variant="destructive">
+                          Wrong network
+                        </Button>
+                      );
+                    }
+
+                    return (
+                      <div className="flex items-center gap-3">
+                        <Button
+                          onClick={openChainModal}
+                          variant="ghost"
+                          className="text-white hover:bg-white/10 hidden sm:flex"
+                        >
+                          {chain.hasIcon && (
+                            <div
+                              style={{
+                                background: chain.iconBackground,
+                                width: 16,
+                                height: 16,
+                                borderRadius: 999,
+                                overflow: 'hidden',
+                                marginRight: 4,
+                              }}
+                            >
+                              {chain.iconUrl && (
+                                <img
+                                  alt={chain.name ?? 'Chain icon'}
+                                  src={chain.iconUrl}
+                                  style={{ width: 16, height: 16 }}
+                                />
+                              )}
+                            </div>
+                          )}
+                        </Button>
+
+                        <Button
+                          onClick={openAccountModal}
+                          className="bg-white/5 border border-white/10 text-white hover:bg-white/10"
+                        >
+                          <span className="hidden sm:inline mr-2">
+                            {resolvedName || account.displayName}
+                          </span>
+                          <span className="sm:hidden">
+                            {resolvedName || `${account.address.slice(0, 6)}...${account.address.slice(-4)}`}
+                          </span>
+                          {account.displayBalance && (
+                            <span className="hidden lg:inline ml-2 text-blue-400">
+                              {account.displayBalance}
+                            </span>
+                          )}
+                        </Button>
+                      </div>
+                    );
+                  })()}
+                </div>
+              );
+            }}
+          </ConnectButton.Custom>
         </div>
       </div>
     </header>

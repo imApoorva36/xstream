@@ -1,24 +1,36 @@
 'use client';
 
-import { baseSepolia } from 'wagmi/chains';
-import { OnchainKitProvider } from '@coinbase/onchainkit';
+import { base, baseSepolia, mainnet, sepolia, optimism, arbitrum, polygon } from 'wagmi/chains';
+import { RainbowKitProvider, getDefaultConfig, darkTheme } from '@rainbow-me/rainbowkit';
+import { WagmiProvider } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import '@rainbow-me/rainbowkit/styles.css';
+
+const config = getDefaultConfig({
+  appName: 'xStream',
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID',
+  chains: [base, baseSepolia, mainnet, sepolia, optimism, arbitrum, polygon],
+  ssr: true,
+});
+
+const queryClient = new QueryClient();
 
 export function Providers(props: { children: ReactNode }) {
   return (
-    <OnchainKitProvider
-      apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
-      chain={baseSepolia}
-      config={{
-        appearance: {
-          mode: "auto",
-          logo: "/x402-icon-blue.png",
-          name: "Next Advanced x402 Demo",
-        },
-      }}
-    >
-      {props.children}
-    </OnchainKitProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider
+          theme={darkTheme({
+            accentColor: '#3b82f6',
+            accentColorForeground: 'white',
+            borderRadius: 'medium',
+          })}
+          showRecentTransactions={true}
+        >
+          {props.children}
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
-
