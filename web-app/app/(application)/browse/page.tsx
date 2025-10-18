@@ -240,18 +240,20 @@ function VideoCard({ video }: { video: typeof mockVideos[0] }) {
         </div>
         <div className="p-4">
           <h3 className="text-white font-medium mb-2 line-clamp-2 group-hover:text-blue-400 transition text-sm">{video.title}</h3>
-          <p className="text-gray-400 font-light text-xs mb-3">{video.creator}</p>
+          <p className="text-gray-400 font-light text-xs mb-3">
+            {video.creator?.displayName || video.creator?.username || video.creator?.walletAddress?.slice(0, 6) + '...' || 'Unknown'}
+          </p>
           <div className="flex items-center justify-between text-xs text-gray-400">
             <div className="flex items-center gap-1">
               <Eye className="w-3 h-3" />
-              <span>{video.views.toLocaleString()} views</span>
+              <span>{(video.totalViews || 0).toLocaleString()} views</span>
             </div>
-            <span>{video.uploadDate}</span>
+            <span>{new Date(video.publishedAt).toLocaleDateString()}</span>
           </div>
           <div className="mt-3 pt-3 border-t border-white/10">
             <div className="flex items-center justify-between">
               <span className="text-xs text-gray-400">Price per second</span>
-              <span className="text-blue-400 font-medium">${video.pricePerSecond}</span>
+              <span className="text-blue-400 font-medium">${Number(video.pricePerSecond).toFixed(4)}</span>
             </div>
           </div>
         </div>

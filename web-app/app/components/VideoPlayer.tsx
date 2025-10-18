@@ -60,19 +60,15 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
     return qualityMap[selectedQuality] || 1.0;
   };
 
-  // Calculate current price per second based on quality
   const getCurrentPricePerSecond = () => {
     return video.pricePerSecond * getQualityMultiplier(quality);
   };
 
-  // Calculate total video cost
   const calculateTotalCost = () => {
-    const [minutes, seconds] = video.duration.split(':').map(Number);
-    const totalSeconds = minutes * 60 + seconds;
+    const totalSeconds = typeof video.duration === 'number' ? video.duration : 0;
     return (getCurrentPricePerSecond() * totalSeconds).toFixed(2);
   };
 
-  // Format time
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
@@ -279,7 +275,7 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
               
               <div className="flex items-center space-x-2">
                 <Zap className="h-4 w-4 text-yellow-500" />
-                <span className="text-sm font-base">Quality: {quality}</span>
+                <span className="text-sm font-medium">Quality: {quality}</span>
               </div>
             </div>
           </CardContent>
@@ -297,10 +293,10 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
           </DialogHeader>
           
           <div className="space-y-4">
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-base">Recommended Stake:</span>
-                <span className="text-lg font-medium text-blue-600">${calculateTotalCost()}</span>
+                <span className="text-sm font-medium">Recommended Stake:</span>
+                <span className="text-lg font-bold text-blue-600">${calculateTotalCost()}</span>
               </div>
               <p className="text-xs text-gray-600 dark:text-gray-400">
                 For full video at {quality} quality
@@ -308,7 +304,7 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-base mb-2">Stake Amount (USD)</label>
+              <label className="block text-sm font-medium mb-2">Stake Amount (USD)</label>
               <Input
                 type="number"
                 placeholder="0.00"
@@ -348,10 +344,10 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="p-4 border rounded-md">
+          <div className="p-4 border rounded-lg">
             <div className="flex items-center space-x-2 mb-2">
               <AlertCircle className="h-4 w-4 text-amber-500" />
-              <span className="font-base">Payment Authorization</span>
+              <span className="font-medium">Payment Authorization</span>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               This video will charge you based on your watch time and selected quality.

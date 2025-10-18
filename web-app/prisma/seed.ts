@@ -3,397 +3,281 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('🌱 Starting database seeding...')
+  console.log('🌱 Starting database seeding for xStream...\n')
 
-  // Create sample achievements
-  console.log('Creating achievements...')
-  const achievements = await Promise.all([
-    // Watch Time Achievements
-    prisma.achievement.create({
-      data: {
-        name: 'First Steps',
-        description: 'Watch your first 60 seconds of content',
-        category: 'WATCH_TIME',
-        threshold: 60,
-        imageUrl: '/achievements/first-steps.png',
-        utilityLevel: 1
-      }
-    }),
-    prisma.achievement.create({
-      data: {
-        name: '10 Minute Milestone',
-        description: 'Watch 10 minutes of content',
-        category: 'WATCH_TIME',
-        threshold: 600,
-        imageUrl: '/achievements/10-minutes.png',
-        utilityLevel: 2
-      }
-    }),
-    prisma.achievement.create({
-      data: {
-        name: 'Hour Hero',
-        description: 'Watch 1 hour of content',
-        category: 'WATCH_TIME',
-        threshold: 3600,
-        imageUrl: '/achievements/hour-hero.png',
-        utilityLevel: 3
-      }
-    }),
-    prisma.achievement.create({
-      data: {
-        name: 'Binge Watcher',
-        description: 'Watch 10 hours of content',
-        category: 'WATCH_TIME',
-        threshold: 36000,
-        imageUrl: '/achievements/binge-watcher.png',
-        utilityLevel: 4
-      }
-    }),
-    prisma.achievement.create({
-      data: {
-        name: 'Content Connoisseur',
-        description: 'Watch 100 hours of content',
-        category: 'WATCH_TIME',
-        threshold: 360000,
-        imageUrl: '/achievements/connoisseur.png',
-        utilityLevel: 5
-      }
-    }),
+  // Clear existing data (optional - comment out if you want to keep existing data)
+  console.log('🗑️  Clearing existing data...')
+  await prisma.creatorEarning.deleteMany()
+  await prisma.viewSession.deleteMany()
+  await prisma.video.deleteMany()
+  await prisma.user.deleteMany()
+  console.log('✅ Existing data cleared\n')
 
-    // Creator Achievements
-    prisma.achievement.create({
+  // Create sample users (creators and viewers)
+  console.log('👥 Creating users...')
+  const users = await Promise.all([
+    prisma.user.create({
       data: {
-        name: 'First Upload',
-        description: 'Upload your first video',
-        category: 'CREATOR_UPLOAD',
-        threshold: 1,
-        imageUrl: '/achievements/first-upload.png',
-        utilityLevel: 1
+        walletAddress: '0x1234567890123456789012345678901234567890',
+        username: 'cryptoedu',
+        displayName: 'CryptoEdu',
+        profileImage: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop'
       }
     }),
-    prisma.achievement.create({
+    prisma.user.create({
       data: {
-        name: 'Content Creator',
-        description: 'Upload 10 videos',
-        category: 'CREATOR_UPLOAD',
-        threshold: 10,
-        imageUrl: '/achievements/content-creator.png',
-        utilityLevel: 3
+        walletAddress: '0x2345678901234567890123456789012345678901',
+        username: 'basebuilder',
+        displayName: 'Base Builder',
+        profileImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop'
       }
     }),
-    prisma.achievement.create({
+    prisma.user.create({
       data: {
-        name: 'Prolific Producer',
-        description: 'Upload 100 videos',
-        category: 'CREATOR_UPLOAD',
-        threshold: 100,
-        imageUrl: '/achievements/prolific-producer.png',
-        utilityLevel: 5
+        walletAddress: '0x3456789012345678901234567890123456789012',
+        username: 'web3creator',
+        displayName: 'Web3 Creator',
+        profileImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop'
       }
     }),
-
-    // Platform Loyalty
-    prisma.achievement.create({
+    prisma.user.create({
       data: {
-        name: 'Early Adopter',
-        description: 'Join xStream in the first month',
-        category: 'PLATFORM_LOYALTY',
-        threshold: 1,
-        imageUrl: '/achievements/early-adopter.png',
-        utilityLevel: 4
+        walletAddress: '0x4567890123456789012345678901234567890123',
+        username: 'streamtech',
+        displayName: 'StreamTech',
+        profileImage: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=150&h=150&fit=crop'
       }
     }),
-    prisma.achievement.create({
+    prisma.user.create({
       data: {
-        name: 'Community Champion',
-        description: 'Active for 30 days',
-        category: 'PLATFORM_LOYALTY',
-        threshold: 30,
-        imageUrl: '/achievements/community-champion.png',
-        utilityLevel: 5
+        walletAddress: '0x5678901234567890123456789012345678901234',
+        username: 'viewer1',
+        displayName: 'Alex Viewer',
+        profileImage: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop'
       }
     })
   ])
-
-  console.log(`✅ Created ${achievements.length} achievements`)
-
-  // Create sample users
-  console.log('Creating sample users...')
-  const sampleUsers = await Promise.all([
-    prisma.user.create({
-      data: {
-        email: 'creator@example.com',
-        username: 'topCreator',
-        displayName: 'Top Creator',
-        bio: 'Creating amazing content on xStream',
-        walletAddress: '0x742d35cc6634c0532925a3b8d2f8f5c5b032b7e1',
-        emailVerified: true
-      }
-    }),
-    prisma.user.create({
-      data: {
-        email: 'viewer@example.com',
-        username: 'eagleViewer',
-        displayName: 'Eagle Viewer',
-        bio: 'Love watching great content',
-        walletAddress: '0x8ba1f109551bd432803012645hac136c25c12cf',
-        emailVerified: true
-      }
-    }),
-    prisma.user.create({
-      data: {
-        email: 'advertiser@example.com',
-        username: 'adMaster',
-        displayName: 'Ad Master',
-        bio: 'Running effective ad campaigns',
-        walletAddress: '0x742d35cc6634c0532925a3b8d2f8f5c5b032b123',
-        emailVerified: true
-      }
-    })
-  ])
-
-  console.log(`✅ Created ${sampleUsers.length} sample users`)
+  console.log(`✅ Created ${users.length} users\n`)
 
   // Create sample videos
-  console.log('Creating sample videos...')
-  const sampleVideos = await Promise.all([
+  console.log('🎥 Creating videos...')
+  const videos = await Promise.all([
     prisma.video.create({
       data: {
-        title: 'Introduction to DeFi: A Beginner\'s Guide',
-        description: 'Learn the basics of Decentralized Finance and how it\'s revolutionizing the financial world.',
-        videoUrl: 'https://example.com/videos/defi-intro.mp4',
-        thumbnailUrl: 'https://example.com/thumbnails/defi-intro.jpg',
-        duration: 1200, // 20 minutes
-        pricePerSecond: '0.000001', // 0.000001 ETH per second
+        title: 'Introduction to x402 Micropayments',
+        description: 'Learn how x402 enables precise micropayments for content consumption. In this comprehensive tutorial, we explore the revolutionary technology behind pay-per-second streaming.',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1280&h=720&fit=crop&q=80',
+        duration: 630, // 10:30 in seconds
+        pricePerSecond: 0.01,
         category: 'Education',
-        tags: ['DeFi', 'Cryptocurrency', 'Finance', 'Beginner'],
-        status: 'PUBLISHED',
-        publishedAt: new Date(),
-        creatorId: sampleUsers[0].id
+        tags: ['x402', 'micropayments', 'blockchain', 'tutorial'],
+        totalViews: 1250,
+        totalWatchTime: 450000,
+        totalEarnings: 4500,
+        creatorId: users[0].id
       }
     }),
     prisma.video.create({
       data: {
-        title: 'Advanced Trading Strategies',
-        description: 'Master advanced trading techniques and risk management in crypto markets.',
-        videoUrl: 'https://example.com/videos/advanced-trading.mp4',
-        thumbnailUrl: 'https://example.com/thumbnails/advanced-trading.jpg',
-        duration: 1800, // 30 minutes
-        pricePerSecond: '0.000002', // Higher price for advanced content
-        category: 'Trading',
-        tags: ['Trading', 'Strategy', 'Advanced', 'Risk Management'],
-        status: 'PUBLISHED',
-        publishedAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-        creatorId: sampleUsers[0].id
+        title: 'Building on Base: A Developer\'s Guide',
+        description: 'Complete guide to developing dApps on the Base blockchain. Learn about smart contracts, deployment, and best practices.',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1280&h=720&fit=crop&q=80',
+        duration: 945, // 15:45
+        pricePerSecond: 0.008,
+        category: 'Technology',
+        tags: ['base', 'blockchain', 'development', 'smart contracts'],
+        totalViews: 890,
+        totalWatchTime: 320000,
+        totalEarnings: 2560,
+        creatorId: users[1].id
       }
     }),
     prisma.video.create({
       data: {
-        title: 'NFT Art Creation Workshop',
-        description: 'Create your first NFT artwork and learn about digital art monetization.',
-        videoUrl: 'https://example.com/videos/nft-workshop.mp4',
-        thumbnailUrl: 'https://example.com/thumbnails/nft-workshop.jpg',
-        duration: 900, // 15 minutes
-        pricePerSecond: '0.000003', // Premium content
-        category: 'Art',
-        tags: ['NFT', 'Art', 'Creation', 'Workshop'],
-        status: 'PUBLISHED',
-        publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-        creatorId: sampleUsers[0].id
+        title: 'NFT Rewards & Loyalty Programs',
+        description: 'How NFT rewards can revolutionize content creator loyalty. Explore use cases and implementation strategies.',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1620321023374-d1a68fbc720d?w=1280&h=720&fit=crop&q=80',
+        duration: 500, // 8:20
+        pricePerSecond: 0.005,
+        category: 'Web3',
+        tags: ['nft', 'rewards', 'loyalty', 'web3'],
+        totalViews: 2340,
+        totalWatchTime: 580000,
+        totalEarnings: 2900,
+        creatorId: users[2].id
+      }
+    }),
+    prisma.video.create({
+      data: {
+        title: 'Real-time Video Monetization',
+        description: 'The future of pay-per-second video streaming. Learn how creators can earn instant payments from viewers.',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1611224923853-80b023f02d61?w=1280&h=720&fit=crop&q=80',
+        duration: 735, // 12:15
+        pricePerSecond: 0.012,
+        category: 'Business',
+        tags: ['monetization', 'streaming', 'payments', 'creators'],
+        totalViews: 1560,
+        totalWatchTime: 420000,
+        totalEarnings: 5040,
+        creatorId: users[3].id
+      }
+    }),
+    prisma.video.create({
+      data: {
+        title: 'Future of Content Creation',
+        description: 'Exploring how blockchain technology is changing the creator economy. Web3 tools, decentralization, and fair compensation.',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=1280&h=720&fit=crop&q=80',
+        duration: 400, // 6:40
+        pricePerSecond: 0.003,
+        category: 'Entertainment',
+        tags: ['creator economy', 'web3', 'blockchain', 'future'],
+        totalViews: 3200,
+        totalWatchTime: 640000,
+        totalEarnings: 1920,
+        creatorId: users[0].id
+      }
+    }),
+    prisma.video.create({
+      data: {
+        title: 'Blockchain Explained Simply',
+        description: 'A beginner-friendly introduction to blockchain technology. No technical background required!',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1280&h=720&fit=crop&q=80',
+        duration: 570, // 9:30
+        pricePerSecond: 0.007,
+        category: 'Education',
+        tags: ['blockchain', 'beginner', 'tutorial', 'crypto'],
+        totalViews: 4500,
+        totalWatchTime: 890000,
+        totalEarnings: 6230,
+        creatorId: users[1].id
+      }
+    }),
+    prisma.video.create({
+      data: {
+        title: 'Smart Contract Security Best Practices',
+        description: 'Essential security patterns for Solidity developers. Learn how to write secure smart contracts.',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1280&h=720&fit=crop&q=80',
+        duration: 860, // 14:20
+        pricePerSecond: 0.015,
+        category: 'Technology',
+        tags: ['solidity', 'security', 'smart contracts', 'development'],
+        totalViews: 780,
+        totalWatchTime: 290000,
+        totalEarnings: 4350,
+        creatorId: users[2].id
+      }
+    }),
+    prisma.video.create({
+      data: {
+        title: 'DeFi Explained: Lending and Borrowing',
+        description: 'Understanding decentralized finance protocols. How lending pools work and how to use them safely.',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=1280&h=720&fit=crop&q=80',
+        duration: 680, // 11:20
+        pricePerSecond: 0.009,
+        category: 'Finance',
+        tags: ['defi', 'lending', 'borrowing', 'finance'],
+        totalViews: 1890,
+        totalWatchTime: 450000,
+        totalEarnings: 4050,
+        creatorId: users[3].id
       }
     })
   ])
+  console.log(`✅ Created ${videos.length} videos\n`)
 
-  console.log(`✅ Created ${sampleVideos.length} sample videos`)
-
-  // Create video qualities for each video
-  console.log('Creating video qualities...')
-  const videoQualities = []
-  for (const video of sampleVideos) {
-    const qualities = await Promise.all([
-      prisma.videoQuality.create({
-        data: {
-          videoId: video.id,
-          quality: '720p',
-          url: video.videoUrl.replace('.mp4', '_720p.mp4'),
-          fileSize: BigInt(100 * 1024 * 1024), // 100MB
-          bitrate: 2500
-        }
-      }),
-      prisma.videoQuality.create({
-        data: {
-          videoId: video.id,
-          quality: '1080p',
-          url: video.videoUrl.replace('.mp4', '_1080p.mp4'),
-          fileSize: BigInt(200 * 1024 * 1024), // 200MB
-          bitrate: 5000
-        }
-      })
-    ])
-    videoQualities.push(...qualities)
-  }
-
-  console.log(`✅ Created ${videoQualities.length} video quality options`)
-
-  // Create sample view sessions
-  console.log('Creating sample view sessions...')
-  const viewSessions = await Promise.all([
+  // Create sample viewing sessions
+  console.log('📺 Creating view sessions...')
+  const sessions = await Promise.all([
     prisma.viewSession.create({
       data: {
-        sessionToken: 'session_' + Date.now() + '_1',
-        watchedSeconds: 600, // Watched 10 minutes
-        stakedAmount: '0.001',
-        amountCharged: '0.0006', // 600 seconds * 0.000001 ETH
-        status: 'COMPLETED',
-        qualityWatched: '1080p',
-        deviceType: 'desktop',
-        viewerId: sampleUsers[1].id,
-        videoId: sampleVideos[0].id,
-        endTime: new Date()
+        sessionToken: 'session-001-abc123',
+        viewerId: users[4].id, // Alex Viewer
+        videoId: videos[0].id,
+        startTime: new Date('2025-10-16T10:00:00Z'),
+        endTime: new Date('2025-10-16T10:08:30Z'),
+        watchedSeconds: 510,
+        amountCharged: 5.10,
+        status: 'COMPLETED'
       }
     }),
     prisma.viewSession.create({
       data: {
-        sessionToken: 'session_' + Date.now() + '_2',
-        watchedSeconds: 1800, // Watched full video
-        stakedAmount: '0.004',
-        amountCharged: '0.0036', // 1800 seconds * 0.000002 ETH
-        status: 'COMPLETED',
-        qualityWatched: '720p',
-        deviceType: 'mobile',
-        viewerId: sampleUsers[1].id,
-        videoId: sampleVideos[1].id,
-        endTime: new Date()
+        sessionToken: 'session-002-def456',
+        viewerId: users[4].id,
+        videoId: videos[1].id,
+        startTime: new Date('2025-10-16T14:30:00Z'),
+        endTime: new Date('2025-10-16T14:42:00Z'),
+        watchedSeconds: 720,
+        amountCharged: 5.76,
+        status: 'COMPLETED'
+      }
+    }),
+    prisma.viewSession.create({
+      data: {
+        sessionToken: 'session-003-ghi789',
+        viewerId: users[4].id,
+        videoId: videos[2].id,
+        startTime: new Date('2025-10-17T09:15:00Z'),
+        watchedSeconds: 180,
+        amountCharged: 0.90,
+        status: 'ACTIVE'
       }
     })
   ])
-
-  console.log(`✅ Created ${viewSessions.length} sample view sessions`)
-
-  // Update video stats based on sessions
-  console.log('Updating video statistics...')
-  await prisma.video.update({
-    where: { id: sampleVideos[0].id },
-    data: {
-      totalViews: 1,
-      totalWatchTime: 600,
-      totalEarnings: '0.0006',
-      uniqueViewers: 1
-    }
-  })
-
-  await prisma.video.update({
-    where: { id: sampleVideos[1].id },
-    data: {
-      totalViews: 1,
-      totalWatchTime: 1800,
-      totalEarnings: '0.0036',
-      uniqueViewers: 1
-    }
-  })
-
-  // Create sample ad campaign
-  console.log('Creating sample ad campaign...')
-  const adCampaign = await prisma.adCampaign.create({
-    data: {
-      name: 'Crypto Exchange Promotion',
-      description: 'Promote our new crypto exchange platform',
-      adContentUrl: 'https://example.com/ads/crypto-exchange.mp4',
-      targetUrl: 'https://example-exchange.com',
-      totalBudget: '1.0',
-      remainingBudget: '0.8',
-      pricePerView: '0.0001',
-      pricePerClick: '0.001',
-      targetCategories: ['Trading', 'Finance'],
-      targetCountries: ['US', 'UK', 'CA'],
-      status: 'ACTIVE',
-      startDate: new Date(),
-      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-      advertiserId: sampleUsers[2].id
-    }
-  })
-
-  console.log('✅ Created sample ad campaign')
-
-  // Create sample user stakes
-  console.log('Creating sample user stakes...')
-  await prisma.userStake.create({
-    data: {
-      amount: '0.1',
-      status: 'ACTIVE',
-      userId: sampleUsers[1].id
-    }
-  })
+  console.log(`✅ Created ${sessions.length} view sessions\n`)
 
   // Create sample creator earnings
-  console.log('Creating sample creator earnings...')
-  await prisma.creatorEarning.create({
-    data: {
-      amount: '0.0042', // Total from both videos
-      source: 'VIDEO_VIEWS',
-      status: 'PAID',
-      creatorId: sampleUsers[0].id,
-      description: 'Earnings from video views',
-      paidAt: new Date()
-    }
-  })
+  console.log('💰 Creating creator earnings...')
+  const earnings = await Promise.all([
+    prisma.creatorEarning.create({
+      data: {
+        creatorId: users[0].id, // CryptoEdu
+        amount: 5.10,
+        videoId: videos[0].id,
+        sessionId: sessions[0].id,
+        status: 'PAID',
+        txHash: '0xabc123def456...',
+        paidAt: new Date('2025-10-16T10:09:00Z')
+      }
+    }),
+    prisma.creatorEarning.create({
+      data: {
+        creatorId: users[1].id, // Base Builder
+        amount: 5.76,
+        videoId: videos[1].id,
+        sessionId: sessions[1].id,
+        status: 'PAID',
+        txHash: '0xdef456ghi789...',
+        paidAt: new Date('2025-10-16T14:43:00Z')
+      }
+    }),
+    prisma.creatorEarning.create({
+      data: {
+        creatorId: users[2].id, // Web3 Creator
+        amount: 0.90,
+        videoId: videos[2].id,
+        sessionId: sessions[2].id,
+        status: 'PENDING'
+      }
+    })
+  ])
+  console.log(`✅ Created ${earnings.length} creator earnings\n`)
 
-  // Grant some achievements to viewer
-  console.log('Granting sample achievements...')
-  await prisma.userAchievement.create({
-    data: {
-      userId: sampleUsers[1].id,
-      achievementId: achievements[0].id, // First Steps
-      currentValue: 2400, // Total watch time
-      isEarned: true,
-      earnedAt: new Date()
-    }
-  })
-
-  await prisma.userAchievement.create({
-    data: {
-      userId: sampleUsers[1].id,
-      achievementId: achievements[1].id, // 10 Minute Milestone
-      currentValue: 2400,
-      isEarned: true,
-      earnedAt: new Date()
-    }
-  })
-
-  // Create initial platform analytics
-  console.log('Creating initial platform analytics...')
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  
-  await prisma.platformAnalytics.create({
-    data: {
-      date: today,
-      dailyActiveUsers: 3,
-      newUsers: 3,
-      totalUsers: 3,
-      newVideos: 3,
-      totalVideos: 3,
-      totalWatchTime: 2400,
-      totalRevenue: '0.0042',
-      creatorRevenue: '0.0042',
-      platformRevenue: '0',
-      totalSessions: 2,
-      averageSessionLength: 1200
-    }
-  })
-
-  console.log('🎉 Database seeding completed successfully!')
-  console.log('\n📊 Seeded data summary:')
-  console.log(`- ${achievements.length} achievements`)
-  console.log(`- ${sampleUsers.length} users`)
-  console.log(`- ${sampleVideos.length} videos`)
-  console.log(`- ${videoQualities.length} video quality options`)
-  console.log(`- ${viewSessions.length} view sessions`)
-  console.log('- 1 ad campaign')
-  console.log('- 1 user stake')
-  console.log('- 1 creator earning record')
-  console.log('- 2 user achievements')
-  console.log('- 1 platform analytics record')
+  // Summary
+  console.log('📊 Seeding Summary:')
+  console.log(`   • ${users.length} users created`)
+  console.log(`   • ${videos.length} videos created`)
+  console.log(`   • ${sessions.length} view sessions created`)
+  console.log(`   • ${earnings.length} earnings records created`)
+  console.log('\n✨ Database seeding completed successfully!')
 }
 
 main()
