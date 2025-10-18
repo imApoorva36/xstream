@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Header from "../components/Header";
 import { Name } from "@coinbase/onchainkit/identity";
 import { useAccount } from "wagmi";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +22,7 @@ import {
   CheckCircle,
   Target
 } from "lucide-react";
+import Image from "next/image";
 
 export default function UploadPage() {
   const [uploadStep, setUploadStep] = useState(1);
@@ -124,29 +124,20 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
-      <Header />
+    <div className="min-h-screen bg-black/20 backdrop-blur-lg">
       
       {/* Creator Tool Banner */}
-      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 border-b border-blue-500/50">
+      <div className="mt-2 bg-gradient-to-r from-blue-600 to-cyan-600 border-b border-blue-500/50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-white/20 p-2 rounded-lg backdrop-blur">
-                <UploadIcon className="h-6 w-6 text-white" />
-              </div>
+              <Image src='/logo.png' alt='xStream Logo' width={36} height={36} />
               <div>
-                <h2 className="text-white font-bold text-lg">Creator Studio - Upload</h2>
-                <p className="text-blue-100 text-sm">Share your content and start earning</p>
+                <h2 className="text-white font-base text-lg">Creator Studio - Upload</h2>
+                <p className="text-slate-100 font-light text-xs">Share your content and start earning</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Link href="/advertise" className="hidden md:block">
-                <Button variant="ghost" className="bg-white/20 hover:bg-white/30 text-white border-white/30">
-                  <Target className="h-4 w-4 mr-2" />
-                  Advertise
-                </Button>
-              </Link>
               <Badge className="bg-white/20 text-white border-white/30 hidden sm:flex">
                 Creator Tool
               </Badge>
@@ -157,7 +148,7 @@ export default function UploadPage() {
       
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-3xl font-medium text-white mb-2">
             Upload Video
           </h1>
           <p className="text-gray-300">
@@ -171,9 +162,9 @@ export default function UploadPage() {
             {[1, 2, 3, 4].map((step) => (
               <div key={step} className="flex items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-base ${
                     step <= uploadStep
-                      ? "bg-blue-600 text-white"
+                      ? "bg-slate-200 text-black"
                       : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
                   }`}
                 >
@@ -201,18 +192,18 @@ export default function UploadPage() {
 
         {/* Step 1: Upload Video */}
         {uploadStep === 1 && (
-          <Card>
-            <CardContent className="p-8">
+          <Card className="bg-slate-950 backdrop-blur border-white/10">
+            <CardContent className="p-12">
               <div className="text-center">
-                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-12">
+                <div className="border-2 border-dashed border-white/10 rounded-md p-12 bg-white/5">
                   <Video className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-lg font-medium text-white mb-2">
                     Upload your video
                   </h3>
-                  <p className="text-gray-500 dark:text-gray-400 mb-6">
+                  <p className="text-gray-400 mb-6">
                     Choose a video file to get started
                   </p>
-                  
+
                   <input
                     type="file"
                     accept="video/*"
@@ -221,13 +212,13 @@ export default function UploadPage() {
                     id="video-upload"
                   />
                   <label htmlFor="video-upload">
-                    <Button className="cursor-pointer">
+                    <Button variant="outline" size="sm" className="border-white/20 text-gray-200 cursor-pointer">
                       <UploadIcon className="h-4 w-4 mr-2" />
                       Select Video File
                     </Button>
                   </label>
-                  
-                  <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+
+                  <div className="mt-4 text-sm text-gray-400">
                     <p>Supported formats: MP4, MOV, AVI, WMV</p>
                     <p>Maximum file size: 2GB</p>
                   </div>
@@ -249,7 +240,7 @@ export default function UploadPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Title</label>
+                  <label className="block text-sm font-base mb-2">Title</label>
                   <Input
                     placeholder="Enter video title"
                     value={title}
@@ -258,7 +249,7 @@ export default function UploadPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Description</label>
+                  <label className="block text-sm font-base mb-2">Description</label>
                   <Textarea
                     placeholder="Describe your video content"
                     value={description}
@@ -268,7 +259,7 @@ export default function UploadPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Tags</label>
+                  <label className="block text-sm font-base mb-2">Tags</label>
                   <Input
                     placeholder="Enter tags separated by commas"
                     value={tags}
@@ -280,7 +271,7 @@ export default function UploadPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Category</label>
+                  <label className="block text-sm font-base mb-2">Category</label>
                   <Select value={category} onValueChange={setCategory}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
@@ -299,12 +290,12 @@ export default function UploadPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Thumbnail</label>
+                  <label className="block text-sm font-base mb-2">Thumbnail</label>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => setThumbnail(e.target.files?.[0] || null)}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                   />
                 </div>
               </CardContent>
@@ -337,7 +328,7 @@ export default function UploadPage() {
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium mb-2">
+                    <label className="block text-sm font-base mb-2">
                       Price per Second (USD)
                     </label>
                     <Input
@@ -354,7 +345,7 @@ export default function UploadPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">
+                    <label className="block text-sm font-base mb-2">
                       Maximum Quality
                     </label>
                     <Select value={maxQuality} onValueChange={setMaxQuality}>
@@ -373,8 +364,8 @@ export default function UploadPage() {
                 </div>
 
                 {/* Pricing Preview */}
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                  <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-3">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md">
+                  <h4 className="font-base text-blue-700 dark:text-blue-300 mb-3">
                     Pricing Preview (5 min video example)
                   </h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -385,7 +376,7 @@ export default function UploadPage() {
                           <Badge variant="outline" className="mb-1">
                             {option.value}
                           </Badge>
-                          <p className="font-medium">
+                          <p className="font-base">
                             ${(parseFloat(pricePerSecond) * option.multiplier * 300).toFixed(2)}
                           </p>
                         </div>
@@ -394,11 +385,11 @@ export default function UploadPage() {
                 </div>
 
                 {/* Upload Fee Info */}
-                <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg">
+                <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-md">
                   <div className="flex items-start space-x-2">
                     <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
                     <div>
-                      <h4 className="font-medium text-amber-700 dark:text-amber-300">
+                      <h4 className="font-base text-amber-700 dark:text-amber-300">
                         Upload Fee
                       </h4>
                       <p className="text-sm text-amber-600 dark:text-amber-400">
@@ -436,24 +427,24 @@ export default function UploadPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Video Summary */}
-              <div className="border rounded-lg p-4">
-                <h4 className="font-medium mb-3">Video Summary</h4>
+              <div className="border rounded-md p-4">
+                <h4 className="font-base mb-3">Video Summary</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="text-gray-500">Title:</span>
-                    <p className="font-medium">{title || "Untitled Video"}</p>
+                    <p className="font-base">{title || "Untitled Video"}</p>
                   </div>
                   <div>
                     <span className="text-gray-500">Max Quality:</span>
-                    <p className="font-medium">{maxQuality}</p>
+                    <p className="font-base">{maxQuality}</p>
                   </div>
                   <div>
                     <span className="text-gray-500">Price per Second:</span>
-                    <p className="font-medium">${pricePerSecond}</p>
+                    <p className="font-base">${pricePerSecond}</p>
                   </div>
                   <div>
                     <span className="text-gray-500">Upload Fee:</span>
-                    <p className="font-medium">$0.50 (via x402)</p>
+                    <p className="font-base">$0.50 (via x402)</p>
                   </div>
                 </div>
               </div>
@@ -471,11 +462,11 @@ export default function UploadPage() {
 
               {/* Error Message */}
               {uploadError && (
-                <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+                <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-md border border-red-200 dark:border-red-800">
                   <div className="flex items-start space-x-2">
                     <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <h4 className="font-medium text-red-700 dark:text-red-300">
+                      <h4 className="font-base text-red-700 dark:text-red-300">
                         Upload Failed
                       </h4>
                       <p className="text-sm text-red-600 dark:text-red-400">
@@ -520,7 +511,7 @@ export default function UploadPage() {
             <Card>
               <CardContent className="p-8 text-center">
                 <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-600" />
-                <h3 className="text-2xl font-bold text-white mb-2">
+                <h3 className="text-2xl font-medium text-white mb-2">
                   {isConnected && address ? (
                     <>🎉 Congratulations, <Name address={address} className="text-blue-400" />!</>
                   ) : (
@@ -530,7 +521,7 @@ export default function UploadPage() {
                 <p className="text-gray-300 mb-6">
                   Your video is now live on xStream and ready for viewers to watch and pay per second.
                 </p>
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6 text-sm">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md mb-6 text-sm">
                   <p className="text-gray-600 dark:text-gray-400">
                     <strong>Note:</strong> In this demo, a sample video URL is used. In production, your actual video file would be uploaded to decentralized storage (IPFS/Arweave) or cloud storage.
                   </p>
@@ -560,11 +551,11 @@ export default function UploadPage() {
             <Card className="border-2 border-blue-500/50 bg-gradient-to-br from-blue-500/10 to-cyan-500/10">
               <CardContent className="p-8">
                 <div className="flex flex-col md:flex-row items-center gap-6">
-                  <div className="bg-gradient-to-br from-blue-500 to-cyan-500 p-4 rounded-xl">
+                  <div className="bg-gradient-to-br from-blue-500 to-cyan-500 p-4 rounded-md">
                     <Target className="h-12 w-12 text-white" />
                   </div>
                   <div className="flex-1 text-center md:text-left">
-                    <h3 className="text-2xl font-bold text-white mb-2">
+                    <h3 className="text-2xl font-medium text-white mb-2">
                       Want More Views? Try Advertising! 🚀
                     </h3>
                     <p className="text-gray-300 mb-4">

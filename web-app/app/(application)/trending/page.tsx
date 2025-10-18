@@ -5,7 +5,6 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import Link from "next/link";
-import Header from "../components/Header";
 import { TrendingUp, Eye, Flame, Clock, Star } from "lucide-react";
 
 const trendingVideos = [
@@ -85,36 +84,39 @@ const trendingVideos = [
 
 export default function TrendingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
-      <Header />
+    <div className="min-h-screen bg-black/20 backdrop-blur-lg p-4">
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-3 rounded-xl">
-              <TrendingUp className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-white">Trending Now</h1>
-              <p className="text-gray-300">Most popular videos on xStream right now</p>
-            </div>
+          <div className="flex flex-col items-start gap-3 mb-4">
+            <h1 className="text-4xl font-medium text-white">Trending Now</h1>
+            <p className="text-gray-300 text-sm font-light">Most popular videos on xStream right now</p>
           </div>
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="hot" className="mb-8">
+        <Tabs defaultValue="hot" className="mb-8 text-sm font-light">
           <TabsList className="bg-white/5 border border-white/10">
-            <TabsTrigger value="hot">
-              <Flame className="w-4 h-4 mr-2" />
+            <TabsTrigger
+              value="hot"
+              className="flex items-center gap-2 text-gray-300 hover:text-white data-[state=active]:bg-white/15 data-[state=active]:text-white data-[state=active]:border"
+            >
+              <Flame className="w-4 h-4" />
               Hot
             </TabsTrigger>
-            <TabsTrigger value="new">
-              <Clock className="w-4 h-4 mr-2" />
+            <TabsTrigger
+              value="new"
+              className="flex items-center gap-2 text-gray-300 hover:text-white data-[state=active]:bg-white/15 data-[state=active]:text-white data-[state=active]:border"
+            >
+              <Clock className="w-4 h-4" />
               New & Rising
             </TabsTrigger>
-            <TabsTrigger value="top">
-              <Star className="w-4 h-4 mr-2" />
+            <TabsTrigger
+              value="top"
+              className="flex items-center gap-2 text-gray-300 hover:text-white data-[state=active]:bg-white/15 data-[state=active]:text-white data-[state=active]:border"
+            >
+              <Star className="w-4 h-4" />
               Top Rated
             </TabsTrigger>
           </TabsList>
@@ -147,12 +149,12 @@ function VideoGrid({ videos }: { videos: typeof trendingVideos }) {
 function VideoCard({ video }: { video: typeof trendingVideos[0] }) {
   return (
     <Link href={`/watch/${video.id}`}>
-      <Card className="group bg-white/5 backdrop-blur border-white/10 hover:bg-white/10 hover:border-blue-500/50 transition-all overflow-hidden cursor-pointer">
+      <Card className="group bg-slate-950 backdrop-blur border-white/10 hover:bg-white/10 hover:border-blue-500/50 transition-all overflow-hidden cursor-pointer">
         <div className="relative aspect-video overflow-hidden">
-          <img 
-            src={video.thumbnail} 
+          <img
+            src={video.thumbnail}
             alt={video.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover brightness-75 group-hover:brightness-90 group-hover:scale-105 transition-[filter,transform] duration-300"
           />
           <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs text-white">{video.duration}</div>
           <Badge className="absolute top-2 left-2 bg-blue-500/90 flex items-center gap-1">
@@ -161,8 +163,8 @@ function VideoCard({ video }: { video: typeof trendingVideos[0] }) {
           </Badge>
         </div>
         <div className="p-4">
-          <h3 className="text-white font-semibold mb-2 line-clamp-2 group-hover:text-blue-400 transition">{video.title}</h3>
-          <p className="text-gray-400 text-sm mb-3">{video.creator}</p>
+          <h3 className="text-white font-medium mb-2 line-clamp-2 group-hover:text-blue-400 transition">{video.title}</h3>
+          <p className="text-gray-400 font-light text-xs mb-3">{video.creator}</p>
           <div className="flex items-center justify-between text-xs text-gray-400">
             <div className="flex items-center gap-1">
               <Eye className="w-3 h-3" />
@@ -173,7 +175,7 @@ function VideoCard({ video }: { video: typeof trendingVideos[0] }) {
           <div className="mt-3 pt-3 border-t border-white/10">
             <div className="flex items-center justify-between">
               <span className="text-xs text-gray-400">Price per second</span>
-              <span className="text-blue-400 font-semibold">${video.pricePerSecond}</span>
+              <span className="text-blue-400 font-medium">${video.pricePerSecond}</span>
             </div>
           </div>
         </div>

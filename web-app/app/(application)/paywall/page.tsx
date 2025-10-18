@@ -3,7 +3,7 @@
 import { Wallet, ConnectWallet } from "@coinbase/onchainkit/wallet";
 import { Avatar, Name } from "@coinbase/onchainkit/identity";
 import { useState } from "react";
-import { verifyPayment } from "../actions";
+import { verifyPayment } from "../../actions";
 import { PaymentRequirements, PaymentPayload } from "x402/types";
 import { preparePaymentHeader } from "x402/client";
 import { getNetworkId } from "x402/shared";
@@ -91,7 +91,7 @@ function PaymentForm({
       <button
         disabled={!isConnected}
         onClick={handlePayment}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
       >
         Pay
       </button>

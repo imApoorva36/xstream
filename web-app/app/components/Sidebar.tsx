@@ -1,7 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
   Home, 
   TrendingUp, 
@@ -11,18 +9,19 @@ import {
   History, 
   PlaySquare,
   Upload,
-  Settings,
-  HelpCircle,
-  DollarSign,
-  Zap,
-  Award
+  ChevronLeft,
+  ChevronRight,
+  DollarSignIcon
 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useSidebar } from "./SidebarContext";
+import { Button } from "@/components/ui/button";
 
 const navigationItems = [
-  { icon: Home, label: "Home", href: "/", active: true },
+  { icon: Home, label: "Home", href: "/browse" },
   { icon: TrendingUp, label: "Trending", href: "/trending" },
-  { icon: PlaySquare, label: "Subscriptions", href: "/subscriptions" },
+  { icon: PlaySquare, label: "Dashboard", href: "/dashboard" },
 ];
 
 const libraryItems = [
@@ -34,34 +33,50 @@ const libraryItems = [
 
 const creatorItems = [
   { icon: Upload, label: "Upload Video", href: "/upload" },
-  { icon: DollarSign, label: "Analytics", href: "/analytics" },
-  { icon: Award, label: "My NFTs", href: "/nfts" },
-];
-
-const settingsItems = [
-  { icon: Settings, label: "Settings", href: "/settings" },
-  { icon: HelpCircle, label: "Help", href: "/help" },
+  { icon: DollarSignIcon, label: "Advertise", href: "/advertise" }
 ];
 
 export default function Sidebar() {
+  const { isCollapsed, setIsCollapsed } = useSidebar();
+  const pathname = usePathname();
+
   return (
-    <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden md:block">
-      <div className="p-4 space-y-6">
+    <div className={`${isCollapsed ? 'w-20' : 'w-64'} fixed left-0 top-[73px] bottom-0 bg-black/20 backdrop-blur-lg border-r border-gray-200 dark:border-gray-700 hidden md:block transition-all duration-300 z-40`}>
+      {/* Toggle Button */}
+      <Button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="absolute -right-3 top-6 z-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+      >
+        {isCollapsed ? (
+          <ChevronRight className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+        ) : (
+          <ChevronLeft className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+        )}
+      </Button>
+
+      <div className="p-4 space-y-6 overflow-y-auto h-full mt-2">
         
         {/* Main Navigation */}
         <div>
           <nav className="space-y-1">
-            {navigationItems.map((item) => (
-              <Link key={item.label} href={item.href}>
+            {navigationItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
                 <Button
-                  variant={item.active ? "secondary" : "ghost"}
-                  className="w-full justify-start"
+                  key={item.label}
+                  variant="ghost"
+                  className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start'} text-gray-300 hover:text-white hover:bg-white/10 ${isActive ? 'bg-white/20 text-white' : ''}`}
+                  title={isCollapsed ? item.label : undefined}
+                  asChild
                 >
-                  <item.icon className="h-5 w-5 mr-3" />
-                  {item.label}
+                  <Link href={item.href}>
+                    <item.icon className={`h-5 w-5 ${isCollapsed ? '' : 'mr-3'}`} />
+                    {!isCollapsed && <span>{item.label}</span>}
+                  </Link>
                 </Button>
-              </Link>
-            ))}
+              );
+            })}
           </nav>
         </div>
 
@@ -69,18 +84,29 @@ export default function Sidebar() {
 
         {/* Library Section */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3 px-3">
-            Library
-          </h3>
+          {!isCollapsed && (
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 px-3">
+              Library
+            </h3>
+          )}
           <nav className="space-y-1">
-            {libraryItems.map((item) => (
-              <Link key={item.label} href={item.href}>
-                <Button variant="ghost" className="w-full justify-start">
-                  <item.icon className="h-5 w-5 mr-3" />
-                  {item.label}
+            {libraryItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Button
+                  key={item.label}
+                  variant="ghost"
+                  className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start'} text-gray-300 hover:text-white hover:bg-white/10 ${isActive ? 'bg-white/20 text-white' : ''}`}
+                  title={isCollapsed ? item.label : undefined}
+                  asChild
+                >
+                  <Link href={item.href}>
+                    <item.icon className={`h-5 w-5 ${isCollapsed ? '' : 'mr-3'}`} />
+                    {!isCollapsed && <span>{item.label}</span>}
+                  </Link>
                 </Button>
-              </Link>
-            ))}
+              );
+            })}
           </nav>
         </div>
 
@@ -88,77 +114,40 @@ export default function Sidebar() {
 
         {/* Creator Tools */}
         <div>
-          <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3 px-3">
-            Creator Tools
-          </h3>
+          {!isCollapsed && (
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 px-3">
+              Creator Tools
+            </h3>
+          )}
           <nav className="space-y-1">
-            {creatorItems.map((item) => (
-              <Link key={item.label} href={item.href}>
-                <Button variant="ghost" className="w-full justify-start">
-                  <item.icon className="h-5 w-5 mr-3" />
-                  {item.label}
+            {creatorItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Button
+                  key={item.label}
+                  variant="ghost"
+                  className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start'} text-gray-300 hover:text-white hover:bg-white/10 ${isActive ? 'bg-white/20 text-white' : ''}`}
+                  title={isCollapsed ? item.label : undefined}
+                  asChild
+                >
+                  <Link href={item.href}>
+                    <item.icon className={`h-5 w-5 ${isCollapsed ? '' : 'mr-3'}`} />
+                    {!isCollapsed && <span>{item.label}</span>}
+                  </Link>
                 </Button>
-              </Link>
-            ))}
-          </nav>
-        </div>
-
-        <hr className="border-gray-200 dark:border-gray-700" />
-
-        {/* xStream Features */}
-        <div>
-          <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3 px-3">
-            xStream Features
-          </h3>
-          <div className="space-y-2">
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-              <div className="flex items-center space-x-2 mb-2">
-                <Zap className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                  Pay per Second
-                </span>
-              </div>
-              <p className="text-xs text-blue-600 dark:text-blue-400">
-                Only pay for what you watch
-              </p>
-            </div>
-            
-            <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
-              <div className="flex items-center space-x-2 mb-2">
-                <DollarSign className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium text-green-700 dark:text-green-300">
-                  Direct to Creator
-                </span>
-              </div>
-              <p className="text-xs text-green-600 dark:text-green-400">
-                100% goes to creators
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <hr className="border-gray-200 dark:border-gray-700" />
-
-        {/* Settings */}
-        <div>
-          <nav className="space-y-1">
-            {settingsItems.map((item) => (
-              <Link key={item.label} href={item.href}>
-                <Button variant="ghost" className="w-full justify-start">
-                  <item.icon className="h-5 w-5 mr-3" />
-                  {item.label}
-                </Button>
-              </Link>
-            ))}
+              );
+            })}
           </nav>
         </div>
 
         {/* Footer */}
-        <div className="pt-4 text-xs text-gray-500 dark:text-gray-400">
-          <p>© 2024 xStream</p>
-          <p>Powered by x402 & Base</p>
-        </div>
+        {!isCollapsed && (
+          <div className="absolute bottom-4 left-4 text-xs text-gray-500 dark:text-gray-400">
+            <p>© 2025 xStream</p>
+            <p>Powered by x402 & Base</p>
+          </div>
+        )}
       </div>
-    </aside>
+    </div>
   );
 }

@@ -8,7 +8,7 @@ export default function ProtectedPage() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="max-w-2xl mx-auto p-8">
-        <h1 className="text-4xl font-bold mb-4">Protected Content</h1>
+        <h1 className="text-4xl font-medium mb-4">Protected Content</h1>
         <p className="text-lg">
           Your payment was successful! Enjoy this banger song.
         </p>
@@ -16,7 +16,7 @@ export default function ProtectedPage() {
           <p className="text-lg mb-2">Counter: {count}</p>
           <button 
             onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
           >
             Increment
           </button>

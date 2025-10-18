@@ -93,7 +93,7 @@ export default function VideoCard({ video }: VideoCardProps) {
               <AvatarFallback>{video.creator.slice(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+              <p className="text-sm font-base text-gray-900 dark:text-gray-100 truncate">
                 {video.creator}
               </p>
             </div>

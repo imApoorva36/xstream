@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { 
-  Play, 
-  Zap, 
-  TrendingUp, 
-  Shield, 
-  Award, 
+import {
+  Play,
+  Zap,
+  TrendingUp,
+  Shield,
+  Award,
   Coins,
   ArrowRight,
   CheckCircle,
@@ -18,6 +18,7 @@ import {
   Upload,
   Users
 } from "lucide-react";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -26,10 +27,8 @@ export default function Home() {
       <nav className="fixed top-0 w-full z-50 bg-black/20 backdrop-blur-lg border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2 rounded-lg">
-              <Play className="w-6 h-6 text-white" fill="white" />
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+            <Image src="/logo.png" alt="xStream Logo" width={42} height={42} />
+            <span className="text-2xl font-medium bg-white bg-clip-text text-transparent transition-opacity duration-700 animate-pulse">
               xStream
             </span>
           </div>
@@ -71,8 +70,8 @@ export default function Home() {
               <Sparkles className="w-4 h-4 mr-2" />
               Revolutionary Web3 Video Platform
             </Badge>
-            
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold leading-tight">
+
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-medium leading-tight">
               <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">
                 Watch Videos.
               </span>
@@ -81,12 +80,12 @@ export default function Home() {
                 Pay Per Second.
               </span>
             </h1>
-            
+
             <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
-              Pay only for the exact seconds you watch. Creators receive instant compensation 
+              Pay only for the exact seconds you watch. Creators receive instant compensation
               with <span className="text-blue-400 font-semibold">95% revenue share</span> and transparent blockchain verification.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
               <Link href="/browse">
                 <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-lg px-8 py-6 h-auto">
@@ -113,7 +112,7 @@ export default function Home() {
               ].map((stat, i) => (
                 <div key={i} className="text-center">
                   <stat.icon className="w-8 h-8 mx-auto mb-2 text-blue-400" />
-                  <div className="text-3xl font-bold text-white">{stat.value}</div>
+                  <div className="text-3xl font-medium text-white">{stat.value}</div>
                   <div className="text-sm text-gray-400">{stat.label}</div>
                 </div>
               ))}
@@ -126,7 +125,7 @@ export default function Home() {
       <section className="py-20 px-6 bg-black/20">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h2 className="text-4xl md:text-5xl font-medium text-white mb-4">
               Why Choose xStream?
             </h2>
             <p className="text-xl text-gray-300">
@@ -181,7 +180,7 @@ export default function Home() {
       <section className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h2 className="text-4xl md:text-5xl font-medium text-white mb-4">
               How It Works
             </h2>
             <p className="text-xl text-gray-300">
@@ -208,7 +207,7 @@ export default function Home() {
               }
             ].map((step, i) => (
               <div key={i} className="text-center">
-                <div className="text-6xl font-bold bg-gradient-to-r from-blue-500/20 to-cyan-500/20 bg-clip-text text-transparent mb-4">
+                <div className="text-6xl font-medium bg-gradient-to-r from-blue-500/20 to-cyan-500/20 bg-clip-text text-transparent mb-4">
                   {step.step}
                 </div>
                 <h3 className="text-2xl font-semibold text-white mb-3">{step.title}</h3>
@@ -223,7 +222,7 @@ export default function Home() {
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto">
           <Card className="p-12 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 backdrop-blur border-blue-500/30 text-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-medium text-white mb-6">
               Ready to Transform Video Monetization?
             </h2>
             <p className="text-xl text-gray-300 mb-8">
@@ -253,10 +252,10 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2 rounded-lg">
+                <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-2 rounded-md">
                   <Play className="w-5 h-5 text-white" fill="white" />
                 </div>
-                <span className="text-xl font-bold text-white">xStream</span>
+                <span className="text-xl font-medium text-white">xStream</span>
               </div>
               <p className="text-gray-400 text-sm">
                 Revolutionary Web3 streaming platform enabling precise pay-per-second video monetization.
